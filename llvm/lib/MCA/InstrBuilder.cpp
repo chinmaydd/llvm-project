@@ -620,7 +620,7 @@ InstrBuilder::createInstrDescImpl(const MCInst &MCI, bool &StaticDesc) {
   computeMaxLatency(*ID, MCDesc, SCDesc, STI, UseLoadLatency, CallLatency);
 
   if (Error Err = verifyOperands(MCDesc, MCI))
-    return std::move(Err);
+    return Err;
 
   populateWrites(*ID, MCI, SchedClassID);
   populateReads(*ID, MCI, SchedClassID);
@@ -630,7 +630,7 @@ InstrBuilder::createInstrDescImpl(const MCInst &MCI, bool &StaticDesc) {
 
   // Sanity check on the instruction descriptor.
   if (Error Err = verifyInstrDesc(*ID, MCI))
-    return std::move(Err);
+    return Err;
 
   // Now add the new descriptor.
   bool IsVariadic = MCDesc.isVariadic();
@@ -757,12 +757,8 @@ InstrBuilder::createInstruction(const MCInst &MCI) {
     NewIS->getUses().pop_back_n(NewIS->getUses().size() - Idx);
 
   // Early exit if there are no writes.
-  if (D.Writes.empty()) {
-    if (IsInstRecycled)
-      return llvm::make_error<RecycledInstErr>(NewIS);
-    else
-      return std::move(CreatedIS);
-  }
+  if (D.Writes.empty())
+    return NewIS;
 
   // Track register writes that implicitly clear the upper portion of the
   // underlying super-registers using an APInt.
@@ -801,10 +797,7 @@ InstrBuilder::createInstruction(const MCInst &MCI) {
   if (IsInstRecycled && Idx < NewIS->getDefs().size())
     NewIS->getDefs().pop_back_n(NewIS->getDefs().size() - Idx);
 
-  if (IsInstRecycled)
-    return llvm::make_error<RecycledInstErr>(NewIS);
-  else
-    return std::move(CreatedIS);
+  return NewIS;
 }
 } // namespace mca
 } // namespace llvm
