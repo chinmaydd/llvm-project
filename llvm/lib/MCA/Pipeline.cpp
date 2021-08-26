@@ -41,8 +41,7 @@ Expected<unsigned> Pipeline::run() {
     if (!isPaused())
       notifyCycleBegin();
     if (Error Err = runCycle())
-      return Err;
-
+      return std::move(Err);
     notifyCycleEnd();
     ++Cycles;
   } while (hasWorkToProcess());
