@@ -145,7 +145,8 @@ void LSUnitBase::dump() const {
 unsigned LSUnit::dispatch(const InstRef &IR) {
   const InstrDesc &Desc = IR.getInstruction()->getDesc();
   auto MaybeMDA = getMemoryAccessMD(IR);
-  unsigned IsMemBarrier = Desc.HasSideEffects;
+  bool IsStoreBarrier = IR.getInstruction()->isAStoreBarrier();
+  bool IsLoadBarrier = IR.getInstruction()->isALoadBarrier();
   assert((Desc.MayLoad || Desc.MayStore) && "Not a memory operation!");
 
   if (Desc.MayLoad)
@@ -194,12 +195,12 @@ unsigned LSUnit::dispatch(const InstRef &IR) {
 
 
     CurrentStoreGroupID = NewGID;
-    if (IsMemBarrier)
+    if (IsStoreBarrier)
       CurrentStoreBarrierGroupID = NewGID;
 
     if (Desc.MayLoad) {
       CurrentLoadGroupID = NewGID;
-      if (IsMemBarrier)
+      if (IsLoadBarrier)
         CurrentLoadBarrierGroupID = NewGID;
     }
 
@@ -224,7 +225,7 @@ unsigned LSUnit::dispatch(const InstRef &IR) {
   //    However that group has already started execution, so we cannot add
   //    this load to it.
   bool ShouldCreateANewGroup =
-      IsMemBarrier || !ImmediateLoadDominator ||
+      IsLoadBarrier || !ImmediateLoadDominator ||
       CurrentLoadBarrierGroupID == ImmediateLoadDominator ||
       ImmediateLoadDominator <= CurrentStoreGroupID ||
       getGroup(ImmediateLoadDominator).isExecuting();
@@ -249,7 +250,7 @@ unsigned LSUnit::dispatch(const InstRef &IR) {
     }
 
     // A load barrier may not pass a previous load or load barrier.
-    if (IsMemBarrier) {
+    if (IsLoadBarrier) {
       if (ImmediateLoadDominator) {
         MemoryGroup &LoadGroup = getGroup(ImmediateLoadDominator);
         LLVM_DEBUG(dbgs() << "[LSUnit]: GROUP DEP: ("
@@ -269,7 +270,7 @@ unsigned LSUnit::dispatch(const InstRef &IR) {
     }
 
     CurrentLoadGroupID = NewGID;
-    if (IsMemBarrier)
+    if (IsLoadBarrier)
       CurrentLoadBarrierGroupID = NewGID;
     return NewGID;
   }
