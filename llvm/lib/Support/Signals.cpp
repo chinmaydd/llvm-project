@@ -11,6 +11,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+#include <cstdint>
 #include "llvm/Support/Signals.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/ADT/StringRef.h"
