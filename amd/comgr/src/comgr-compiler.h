@@ -44,6 +44,7 @@
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "llvm/IR/DiagnosticInfo.h"
 #include "llvm/IR/DiagnosticPrinter.h"
+#include "llvm/Support/VirtualFileSystem.h"
 
 namespace COMGR {
 
@@ -123,6 +124,9 @@ class AMDGPUCompiler {
   amd_comgr_status_t addDeviceLibraries();
 
   amd_comgr_status_t executeInProcessDriver(llvm::ArrayRef<const char *> Args);
+  
+  llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> OverlayFS;
+  llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> InMemoryFS;
 
 public:
   AMDGPUCompiler(DataAction *ActionInfo, DataSet *InSet, DataSet *OutSet,
