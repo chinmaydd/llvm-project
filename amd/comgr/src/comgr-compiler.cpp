@@ -672,9 +672,11 @@ amd_comgr_status_t executeCommand(const Command &Job, raw_ostream &LogS,
 
     std::unique_ptr<CompilerInstance> Clang(new CompilerInstance());
     Clang->setVerboseOutputStream(LogS);
+    Clang->setFileManager(new FileManager(Clang->getFileSystemOpts(), &VFS));
     if (!Argv.back()) {
       Argv.pop_back();
     }
+
     if (!CompilerInvocation::CreateFromArgs(Clang->getInvocation(), Argv,
                                             Diags)) {
       return AMD_COMGR_STATUS_ERROR;
@@ -746,12 +748,12 @@ AMDGPUCompiler::executeInProcessDriver(ArrayRef<const char *> Args) {
   IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs);
   DiagnosticsEngine Diags(DiagID, &*DiagOpts, DiagClient);
 
-  auto VFS = llvm::vfs::getRealFileSystem();
-  ProcessWarningOptions(Diags, *DiagOpts, *VFS, /*ReportDiags=*/false);
+  // auto VFS = llvm::vfs::getRealFileSystem();
+  ProcessWarningOptions(Diags, *DiagOpts, *OverlayFS, /*ReportDiags=*/false);
 
   Driver TheDriver((Twine(env::getLLVMPath()) + "/bin/clang").str(),
                    llvm::sys::getDefaultTargetTriple(), Diags,
-                   "AMDGPU Code Object Manager", VFS);
+                   "AMDGPU Code Object Manager", OverlayFS);
   TheDriver.setCheckInputsExist(false);
 
   // Log arguments used to build compilation
@@ -772,7 +774,7 @@ AMDGPUCompiler::executeInProcessDriver(ArrayRef<const char *> Args) {
   }
 
   for (auto &Job : C->getJobs()) {
-    if (auto Status = executeCommand(Job, LogS, *DiagOpts, *VFS)) {
+    if (auto Status = executeCommand(Job, LogS, *DiagOpts, *OverlayFS)) {
       return Status;
     }
   }
@@ -1069,8 +1071,15 @@ amd_comgr_status_t AMDGPUCompiler::addDeviceLibraries() {
     for (auto DeviceLib : getDeviceLibraries()) {
       llvm::SmallString<128> DeviceLibPath = DeviceLibsDir;
       path::append(DeviceLibPath, std::get<0>(DeviceLib));
-      if (auto Status = outputToFile(std::get<1>(DeviceLib), DeviceLibPath)) {
-        return Status;
+      // if (auto Status = outputToFile(std::get<1>(DeviceLib), DeviceLibPath))
+      // {
+      //   return Status;
+      // }
+      if (!InMemoryFS->addFile(
+              DeviceLibPath, 0,
+              llvm::MemoryBuffer::getMemBuffer(std::get<1>(DeviceLib)))) {
+        errs() << "\n[InMemoryFS] File was not added!\n";
+        return AMD_COMGR_STATUS_ERROR;
       }
     }
   }
@@ -1946,6 +1955,10 @@ AMDGPUCompiler::AMDGPUCompiler(DataAction *ActionInfo, DataSet *InSet,
     : ActionInfo(ActionInfo), InSet(InSet), OutSetT(DataSet::convert(OutSet)),
       LogS(LogS) {
   initializeCommandLineArgs(Args);
+
+  OverlayFS = new vfs::OverlayFileSystem(vfs::getRealFileSystem());
+  InMemoryFS = new vfs::InMemoryFileSystem;
+  OverlayFS->pushOverlay(InMemoryFS);
 }
 
 AMDGPUCompiler::~AMDGPUCompiler() {
