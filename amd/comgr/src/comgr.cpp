@@ -189,7 +189,6 @@ amd_comgr_status_t dispatchCompilerAction(amd_comgr_action_kind_t ActionKind,
     return Compiler.compileToExecutable();
   case AMD_COMGR_ACTION_TRANSLATE_SPIRV_TO_BC:
     return Compiler.translateSpirvToBitcode();
-
   default:
     return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
   }
@@ -205,6 +204,8 @@ amd_comgr_status_t dispatchAddAction(amd_comgr_action_kind_t ActionKind,
   switch (ActionKind) {
   case AMD_COMGR_ACTION_ADD_PRECOMPILED_HEADERS:
     return addPrecompiledHeaders(ActionInfo, ResultSet);
+  case AMD_COMGR_ACTION_ADD_DEVICE_LIBRARIES:
+    return addDeviceLibraries(ActionInfo, ResultSet);
   default:
     return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
   }
@@ -293,6 +294,8 @@ StringRef getActionKindName(amd_comgr_action_kind_t ActionKind) {
     return "AMD_COMGR_ACTION_UNBUNDLE";
   case AMD_COMGR_ACTION_TRANSLATE_SPIRV_TO_BC:
     return "AMD_COMGR_ACTION_TRANSLATE_SPIRV_TO_BC";
+  case AMD_COMGR_ACTION_ADD_DEVICE_LIBRARIES:
+    return "AMD_COMGR_ACTION_ADD_DEVICE_LIBRARIES";
   }
 
   llvm_unreachable("invalid action");
@@ -1377,6 +1380,7 @@ amd_comgr_status_t AMD_COMGR_API
                                             ResultSetP, *LogP);
       break;
     case AMD_COMGR_ACTION_ADD_PRECOMPILED_HEADERS:
+    case AMD_COMGR_ACTION_ADD_DEVICE_LIBRARIES:
       ActionStatus =
           dispatchAddAction(ActionKind, ActionInfoP, InputSetP, ResultSetP);
       break;

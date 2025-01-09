@@ -49,6 +49,9 @@ struct DataSet;
 amd_comgr_status_t addPrecompiledHeaders(DataAction *ActionInfo,
                                          DataSet *ResultSet);
 
+amd_comgr_status_t addDeviceLibraries(DataAction *ActionInfo,
+                                      DataSet *ResultSet);
+
 llvm::ArrayRef<std::tuple<llvm::StringRef, llvm::StringRef>>
 getDeviceLibraries();
 

@@ -1786,11 +1786,13 @@ typedef enum amd_comgr_action_kind_s {
    * if any input is not SPIR-V.
    */
   AMD_COMGR_ACTION_TRANSLATE_SPIRV_TO_BC = 0x13,
+  
+  AMD_COMGR_ACTION_ADD_DEVICE_LIBRARIES = 0x14,
 
   /**
    * Marker for last valid action kind.
    */
-  AMD_COMGR_ACTION_LAST = AMD_COMGR_ACTION_TRANSLATE_SPIRV_TO_BC
+  AMD_COMGR_ACTION_LAST = AMD_COMGR_ACTION_ADD_DEVICE_LIBRARIES 
 } amd_comgr_action_kind_t;
 
 /**

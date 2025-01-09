@@ -59,6 +59,14 @@ amd_comgr_status_t addObject(DataSet *DataSet, amd_comgr_data_kind_t Kind,
   DataSet->DataObjects.insert(Obj);
   return AMD_COMGR_STATUS_SUCCESS;
 }
+
+static amd_comgr_status_t
+addOCLCObject(DataSet *DataSet,
+              std::tuple<const char *, const void *, size_t> OCLCLib) {
+  return addObject(DataSet, AMD_COMGR_DATA_KIND_BC, std::get<0>(OCLCLib),
+                   std::get<1>(OCLCLib), std::get<2>(OCLCLib));
+}
+
 } // namespace
 
 #include "opencl1.2-c.inc"
@@ -78,6 +86,23 @@ amd_comgr_status_t addPrecompiledHeaders(DataAction *ActionInfo,
 }
 
 #include "libraries.inc"
+static std::tuple<const char*, const void*, size_t> get_oclc_isa_version(llvm::StringRef gfxip) {
+#define AMD_DEVICE_LIBS_GFXIP(target, target_gfxip) \
+  if (gfxip == target_gfxip) return std::make_tuple(#target ".bc", target##_lib, target##_lib_size);
+#include "libraries_defs.inc"
+  return std::make_tuple(nullptr, nullptr, 0);
+}
+
+#define AMD_DEVICE_LIBS_FUNCTION(target, function) \
+  static std::tuple<const char*, const void*, size_t> get_oclc_##function(bool on) { \
+    return std::make_tuple( \
+      on ? "oclc_" #function "_on_lib.bc" : "oclc_" #function "_off_lib.bc", \
+      on ? oclc_##function##_on_lib : oclc_##function##_off_lib, \
+      on ? oclc_##function##_on_lib_size : oclc_##function##_off_lib_size \
+    ); \
+  }
+#include "libraries_defs.inc"
+
 llvm::ArrayRef<std::tuple<llvm::StringRef, llvm::StringRef>>
 getDeviceLibraries() {
   static std::tuple<llvm::StringRef, llvm::StringRef> DeviceLibs[] = {
@@ -88,6 +113,127 @@ getDeviceLibraries() {
 #include "libraries_defs.inc"
   };
   return DeviceLibs;
+}
+
+amd_comgr_status_t addDeviceLibraries(DataAction *ActionInfo,
+                                      DataSet *ResultSet) {
+  if (ActionInfo->Language != AMD_COMGR_LANGUAGE_OPENCL_1_2 &&
+      ActionInfo->Language != AMD_COMGR_LANGUAGE_OPENCL_2_0 &&
+      ActionInfo->Language != AMD_COMGR_LANGUAGE_HIP) {
+    return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+  }
+  if (ActionInfo->Language == AMD_COMGR_LANGUAGE_HIP) {
+    if (auto Status = addObject(ResultSet, AMD_COMGR_DATA_KIND_BC, "hip_lib.bc",
+                                hip_lib, hip_lib_size)) {
+      return Status;
+    }
+  } else {
+    if (auto Status = addObject(ResultSet, AMD_COMGR_DATA_KIND_BC,
+                                "opencl_lib.bc", opencl_lib, opencl_lib_size)) {
+      return Status;
+    }
+  }
+  if (auto Status = addObject(ResultSet, AMD_COMGR_DATA_KIND_BC, "ocml_lib.bc",
+                              ocml_lib, ocml_lib_size)) {
+    return Status;
+  }
+  if (auto Status = addObject(ResultSet, AMD_COMGR_DATA_KIND_BC, "ockl_lib.bc",
+                              ockl_lib, ockl_lib_size)) {
+    return Status;
+  }
+  TargetIdentifier Ident;
+  if (auto Status = parseTargetIdentifier(ActionInfo->IsaName, Ident)) {
+    return Status;
+  }
+  if (!Ident.Processor.consume_front("gfx")) {
+    return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+  }
+  auto IsaVersion = get_oclc_isa_version(Ident.Processor);
+  if (!std::get<0>(IsaVersion)) {
+    report_fatal_error(Twine("Missing device library for gfx") +
+                       Ident.Processor);
+  }
+  if (auto Status = addOCLCObject(ResultSet, IsaVersion)) {
+    return Status;
+  }
+  bool CorrectlyRoundedSqrt = false, DazOpt = false, FiniteOnly = false,
+       UnsafeMath = false, Wavefrontsize64 = false;
+  unsigned CodeObjectVersion = 0;
+  for (auto &Option : ActionInfo->getOptions()) {
+    // Parse code_object_v<N>
+    if (StringRef CoV = Option; CoV.consume_front("code_object_v")) {
+      // String is invalid if:
+      //    - We already parsed a code object version
+      //    - We cannot parse the remaining str as an integer
+      //    - The version is out of bounds.
+      if (CodeObjectVersion || CoV.getAsInteger(10, CodeObjectVersion) ||
+          CodeObjectVersion < 4 || CodeObjectVersion > 6) {
+        return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+      }
+      continue;
+    }
+    bool *Flag = StringSwitch<bool *>(Option)
+                     .Case("correctly_rounded_sqrt", &CorrectlyRoundedSqrt)
+                     .Case("daz_opt", &DazOpt)
+                     .Case("finite_only", &FiniteOnly)
+                     .Case("unsafe_math", &UnsafeMath)
+                     .Case("wavefrontsize64", &Wavefrontsize64)
+                     .Default(nullptr);
+    // It is invalid to provide an unknown option and to repeat an option.
+    if (!Flag || *Flag) {
+      return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+    // TODO: Warn if daz_opt is used as it no longer does anything.
+    *Flag = true;
+  }
+  // Assume V5 in the absence of a code_object_v option.
+  if (!CodeObjectVersion)
+    CodeObjectVersion = 5;
+  if (auto Status = addOCLCObject(
+          ResultSet, get_oclc_correctly_rounded_sqrt(CorrectlyRoundedSqrt))) {
+    return Status;
+  }
+  if (auto Status =
+          addOCLCObject(ResultSet, get_oclc_finite_only(FiniteOnly))) {
+    return Status;
+  }
+  if (auto Status =
+          addOCLCObject(ResultSet, get_oclc_unsafe_math(UnsafeMath))) {
+    return Status;
+  }
+  if (auto Status =
+          addOCLCObject(ResultSet, get_oclc_wavefrontsize64(Wavefrontsize64))) {
+    return Status;
+  }
+  // TODO: We should generate a get_oclc function for the code object version,
+  // but for now we have hardcoded the bitcode file names
+  //    if (auto Status =
+  //            addOCLCObject(ResultSet, get_oclc_code_object(CodeObjectV))) {
+  //      return Status;
+  //    }
+  if (CodeObjectVersion == 6) {
+    if (auto Status = addObject(
+            ResultSet, AMD_COMGR_DATA_KIND_BC, "oclc_abi_version_600_lib.bc",
+            oclc_abi_version_600_lib, oclc_abi_version_600_lib_size)) {
+      return Status;
+    }
+  } else if (CodeObjectVersion == 5) {
+    if (auto Status = addObject(ResultSet, AMD_COMGR_DATA_KIND_BC,
+                                "oclc_abi_version_500_lib.bc",
+                                oclc_abi_version_500_lib,
+                                oclc_abi_version_500_lib_size)) {
+      return Status;
+    }
+  } else if (CodeObjectVersion == 4) {
+    if (auto Status = addObject(ResultSet, AMD_COMGR_DATA_KIND_BC,
+                                "oclc_abi_version_400_lib.bc",
+                                oclc_abi_version_400_lib,
+                                oclc_abi_version_400_lib_size)) {
+      return Status;
+    }
+  } else
+    llvm_unreachable("CodeObjectVersion variable should have been set!");
+  return AMD_COMGR_STATUS_SUCCESS;
 }
 
 } // namespace COMGR

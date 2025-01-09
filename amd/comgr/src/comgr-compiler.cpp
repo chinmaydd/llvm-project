@@ -676,7 +676,7 @@ amd_comgr_status_t executeCommand(const Command &Job, raw_ostream &LogS,
     if (!Argv.back()) {
       Argv.pop_back();
     }
-
+    
     if (!CompilerInvocation::CreateFromArgs(Clang->getInvocation(), Argv,
                                             Diags)) {
       return AMD_COMGR_STATUS_ERROR;
@@ -1071,16 +1071,18 @@ amd_comgr_status_t AMDGPUCompiler::addDeviceLibraries() {
     for (auto DeviceLib : getDeviceLibraries()) {
       llvm::SmallString<128> DeviceLibPath = DeviceLibsDir;
       path::append(DeviceLibPath, std::get<0>(DeviceLib));
-      // if (auto Status = outputToFile(std::get<1>(DeviceLib), DeviceLibPath))
-      // {
-      //   return Status;
-      // }
+#if 0
+      if (auto Status = outputToFile(std::get<1>(DeviceLib), DeviceLibPath)) {
+        return Status;
+      }
+#else
       if (!InMemoryFS->addFile(
-              DeviceLibPath, 0,
-              llvm::MemoryBuffer::getMemBuffer(std::get<1>(DeviceLib)))) {
+            DeviceLibPath, 0,
+            llvm::MemoryBuffer::getMemBuffer(std::get<1>(DeviceLib)))) {
         errs() << "\n[InMemoryFS] File was not added!\n";
         return AMD_COMGR_STATUS_ERROR;
       }
+#endif
     }
   }
 
@@ -1955,7 +1957,7 @@ AMDGPUCompiler::AMDGPUCompiler(DataAction *ActionInfo, DataSet *InSet,
     : ActionInfo(ActionInfo), InSet(InSet), OutSetT(DataSet::convert(OutSet)),
       LogS(LogS) {
   initializeCommandLineArgs(Args);
-
+  
   OverlayFS = new vfs::OverlayFileSystem(vfs::getRealFileSystem());
   InMemoryFS = new vfs::InMemoryFileSystem;
   OverlayFS->pushOverlay(InMemoryFS);
