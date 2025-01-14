@@ -17,10 +17,12 @@
 #ifndef LLVM_CLANG_DRIVER_OFFLOADBUNDLER_H
 #define LLVM_CLANG_DRIVER_OFFLOADBUNDLER_H
 
+#include <llvm/ADT/IntrusiveRefCntPtr.h>
 #include "llvm/Support/Compression.h"
 #include "llvm/Support/Error.h"
-#include "llvm/TargetParser/Triple.h"
 #include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/VirtualFileSystem.h>
+#include "llvm/TargetParser/Triple.h"
 #include <string>
 #include <vector>
 
@@ -37,6 +39,7 @@ public:
   bool HipOpenmpCompatible = false;
   bool Compress = false;
   bool Verbose = false;
+  bool PerformVirtualWrite = false;
   llvm::compression::Format CompressionFormat;
   int CompressionLevel;
 
@@ -56,17 +59,28 @@ class OffloadBundler {
 public:
   const OffloadBundlerConfig &BundlerConfig;
 
-  // TODO: Add error checking from ClangOffloadBundler.cpp
-  OffloadBundler(const OffloadBundlerConfig &BC) : BundlerConfig(BC) {}
+  OffloadBundler(const OffloadBundlerConfig &BC, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
 
   // List bundle IDs. Return true if an error was found.
   static llvm::Error
   ListBundleIDsInFile(llvm::StringRef InputFileName,
-                      const OffloadBundlerConfig &BundlerConfig);
+                      const OffloadBundlerConfig &BundlerConfig,
+                      llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
+  
+  static llvm::Error
+  CheckHeterogeneousArchive((llvm::StringRef ArchiveName,
+                             const OffloadBundlerConfig &BundlerConfig,
+                             llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS = nullptr);
+ 
+  
+  llvm::vfs::FileSystem &getVFS() const { return *VFS; }
 
   llvm::Error BundleFiles();
   llvm::Error UnbundleFiles();
   llvm::Error UnbundleArchive();
+
+private:
+ llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS; 
 };
 
 /// Obtain the offload kind, real machine triple, and an optional TargetID

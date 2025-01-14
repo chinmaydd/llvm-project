@@ -1195,18 +1195,40 @@ CompressedOffloadBundle::decompress(const llvm::MemoryBuffer &Input,
       llvm::toStringRef(DecompressedData));
 }
 
+// TODO: Add error checking from ClangOffloadBundler.cpp
+OffloadBundler::OffloadBundler(
+    const OffloadBundlerConfig &BC,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS)
+    : BundlerConfig(BC), VFS(VFS) {
+  // Provide sane fallback if no VFS is specified.
+  if (!this->VFS)
+    this->VFS = llvm::vfs::getRealFileSystem();
+}
+
 // List bundle IDs. Return true if an error was found.
 Error OffloadBundler::ListBundleIDsInFile(
-    StringRef InputFileName, const OffloadBundlerConfig &BundlerConfig) {
-  // Open Input file.
-  ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
-      MemoryBuffer::getFileOrSTDIN(InputFileName, /*IsText=*/true);
-  if (std::error_code EC = CodeOrErr.getError())
+    StringRef InputFileName, const OffloadBundlerConfig &BundlerConfig,
+    llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+  if (!VFS)
+    VFS = llvm::vfs::getRealFileSystem();
+
+  auto FileOrErr = VFS->openFileForRead(InputFileName);
+  if (std::error_code EC = FileOrErr.getError())
     return createFileError(InputFileName, EC);
+  
+  auto CodeOrErr = FileOrErr.get()->getBuffer(InputFileName);
+  if (std::error_code EC = CodeOrErr.getError())
+    return createStringError(inconvertibleErrorCode(), "Failed to get buffer from file!");
+  
+  // Open Input file.
+  // ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
+  //     MemoryBuffer::getFileOrSTDIN(InputFileName, /*IsText=*/true);
+  // if (std::error_code EC = CodeOrErr.getError())
+  //   return createFileError(InputFileName, EC);
 
   // Decompress the input if necessary.
   Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
-      CompressedOffloadBundle::decompress(**CodeOrErr, BundlerConfig.Verbose);
+      CompressedOffloadBundle::decompress(*CodeOrErr.get(), BundlerConfig.Verbose);
   if (!DecompressedBufferOrErr)
     return createStringError(
         inconvertibleErrorCode(),
@@ -1331,12 +1353,22 @@ Error OffloadBundler::BundleFiles() {
   SmallVector<std::unique_ptr<MemoryBuffer>, 8u> InputBuffers;
   InputBuffers.reserve(BundlerConfig.InputFileNames.size());
   for (auto &I : BundlerConfig.InputFileNames) {
-    ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
-        MemoryBuffer::getFileOrSTDIN(I, /*IsText=*/true);
-    if (std::error_code EC = CodeOrErr.getError())
+    auto FileOrErr = VFS->openFileForRead(I);
+    if (std::error_code EC = FileOrErr.getError())
       return createFileError(I, EC);
+    
+    auto CodeOrErr = FileOrErr.get()->getBuffer(I);
+    if (std::error_code EC = CodeOrErr.getError())
+      return createStringError(inconvertibleErrorCode(), "Failed to get buffer from file!");
+    
     InputBuffers.emplace_back(std::move(*CodeOrErr));
   }
+  //   ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
+  //       MemoryBuffer::getFileOrSTDIN(I, /*IsText=*/true);
+  //   if (std::error_code EC = CodeOrErr.getError())
+  //     return createFileError(I, EC);
+  //   InputBuffers.emplace_back(std::move(*CodeOrErr));
+  // }
 
   // Get the file handler. We use the host buffer as reference.
   assert((BundlerConfig.HostInputIndex != ~0u || BundlerConfig.AllowNoHost) &&
@@ -1398,16 +1430,26 @@ Error OffloadBundler::BundleFiles() {
 
 // Unbundle the files. Return true if an error was found.
 Error OffloadBundler::UnbundleFiles() {
-  // Open Input file.
-  ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
-      MemoryBuffer::getFileOrSTDIN(BundlerConfig.InputFileNames.front(),
-                                   /*IsText=*/true);
+  auto I = BundlerConfig.InputFileNames.front();
+  auto FileOrErr = VFS->openFileForRead(I);
+  if (std::error_code EC = FileOrErr.getError())
+    return createFileError(I, EC);
+
+  auto CodeOrErr = FileOrErr.get()->getBuffer(I);
   if (std::error_code EC = CodeOrErr.getError())
-    return createFileError(BundlerConfig.InputFileNames.front(), EC);
+    return createStringError(inconvertibleErrorCode(),
+                             "Failed to get buffer from file!");
+
+  // Open Input file.
+  // ErrorOr<std::unique_ptr<MemoryBuffer>> CodeOrErr =
+  //     MemoryBuffer::getFileOrSTDIN(BundlerConfig.InputFileNames.front(),
+  //                                  /*IsText=*/true);
+  // if (std::error_code EC = CodeOrErr.getError())
+  //   return createFileError(BundlerConfig.InputFileNames.front(), EC);
 
   // Decompress the input if necessary.
   Expected<std::unique_ptr<MemoryBuffer>> DecompressedBufferOrErr =
-      CompressedOffloadBundle::decompress(**CodeOrErr, BundlerConfig.Verbose);
+      CompressedOffloadBundle::decompress(*CodeOrErr.get(), BundlerConfig.Verbose);
   if (!DecompressedBufferOrErr)
     return createStringError(
         inconvertibleErrorCode(),
@@ -1567,15 +1609,27 @@ getCompatibleOffloadTargets(OffloadTargetInfo &CodeObjectInfo,
 // rule: for a specific processor, a feature either shows up in all target IDs,
 // or does not show up in any target IDs. Otherwise the target ID combination is
 // invalid.
-static Error
+Error
 CheckHeterogeneousArchive(StringRef ArchiveName,
-                          const OffloadBundlerConfig &BundlerConfig) {
-  std::vector<std::unique_ptr<MemoryBuffer>> ArchiveBuffers;
-  ErrorOr<std::unique_ptr<MemoryBuffer>> BufOrErr =
-      MemoryBuffer::getFileOrSTDIN(ArchiveName, true, false);
-  if (std::error_code EC = BufOrErr.getError())
-    return createFileError(ArchiveName, EC);
+                          const OffloadBundlerConfig &BundlerConfig,
+                          llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem> VFS) {
+  if (!VFS)
+    VFS = llvm::vfs::getRealFileSystem();
 
+  auto FileOrErr = VFS->openFileForRead(ArchiveName);
+  if (std::error_code EC = FileOrErr.getError())
+    return createFileError(ArchiveName, EC);
+  
+  auto BufOrErr = FileOrErr.get()->getBuffer(ArchiveFileName);
+  if (std::error_code EC = BufOrErr.getError())
+    return createStringError(inconvertibleErrorCode(), "Failed to get buffer from file!");
+ 
+  // ErrorOr<std::unique_ptr<MemoryBuffer>> BufOrErr =
+  //     MemoryBuffer::getFileOrSTDIN(ArchiveName, true, false);
+  // if (std::error_code EC = BufOrErr.getError())
+  //   return createFileError(ArchiveName, EC);
+
+  std::vector<std::unique_ptr<MemoryBuffer>> ArchiveBuffers;
   ArchiveBuffers.push_back(std::move(*BufOrErr));
   Expected<std::unique_ptr<llvm::object::Archive>> LibOrErr =
       Archive::create(ArchiveBuffers.back()->getMemBufferRef());
@@ -1666,10 +1720,18 @@ Error OffloadBundler::UnbundleArchive() {
     }
   }
 
-  ErrorOr<std::unique_ptr<MemoryBuffer>> BufOrErr =
-      MemoryBuffer::getFileOrSTDIN(IFName, true, false);
+  auto FileOrErr = VFS->openFileForRead(ArchiveName);
+  if (std::error_code EC = FileOrErr.getError())
+    return createFileError(ArchiveName, EC);
+  
+  auto BufOrErr = FileOrErr.get()->getBuffer(ArchiveFileName);
   if (std::error_code EC = BufOrErr.getError())
-    return createFileError(BundlerConfig.InputFileNames.front(), EC);
+    return createStringError(inconvertibleErrorCode(), "Failed to get buffer from file!");
+ 
+  // ErrorOr<std::unique_ptr<MemoryBuffer>> BufOrErr =
+  //     MemoryBuffer::getFileOrSTDIN(IFName, true, false);
+  // if (std::error_code EC = BufOrErr.getError())
+  //   return createFileError(BundlerConfig.InputFileNames.front(), EC);
 
   ArchiveBuffers.push_back(std::move(*BufOrErr));
   Expected<std::unique_ptr<llvm::object::Archive>> LibOrErr =
