@@ -341,11 +341,11 @@ define amdgpu_kernel void @test_class_1_f64(ptr addrspace(1) %out, double %a) #0
 ; SI-LABEL: test_class_1_f64:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s6, -1
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
 ; SI-NEXT:    s_mov_b32 s4, s0
 ; SI-NEXT:    s_mov_b32 s5, s1
+; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    v_cmp_class_f64_e64 s[0:1], s[2:3], 1
 ; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
 ; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
@@ -360,11 +360,11 @@ define amdgpu_kernel void @test_class_64_f64(ptr addrspace(1) %out, double %a) #
 ; SI-LABEL: test_class_64_f64:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s6, -1
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
 ; SI-NEXT:    s_mov_b32 s4, s0
 ; SI-NEXT:    s_mov_b32 s5, s1
+; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    v_cmp_class_f64_e64 s[0:1], s[2:3], 64
 ; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
 ; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
@@ -488,21 +488,19 @@ define amdgpu_kernel void @test_fold_or_class_f32_0(ptr addrspace(1) %out, ptr a
 ; SI-LABEL: test_fold_or_class_f32_0:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
-; SI-NEXT:    s_mov_b32 s10, 0
 ; SI-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
 ; SI-NEXT:    v_mov_b32_e32 v1, 0
-; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b64 s[8:9], s[2:3]
-; SI-NEXT:    buffer_load_dword v0, v[0:1], s[8:11], 0 addr64
-; SI-NEXT:    s_mov_b32 s6, -1
-; SI-NEXT:    s_mov_b32 s4, s0
-; SI-NEXT:    s_mov_b32 s5, s1
+; SI-NEXT:    s_mov_b64 s[4:5], s[2:3]
+; SI-NEXT:    s_mov_b32 s3, 0xf000
+; SI-NEXT:    s_mov_b32 s6, 0
+; SI-NEXT:    s_mov_b32 s7, s3
+; SI-NEXT:    buffer_load_dword v0, v[0:1], s[4:7], 0 addr64
+; SI-NEXT:    s_mov_b32 s2, -1
 ; SI-NEXT:    s_waitcnt vmcnt(0)
-; SI-NEXT:    v_cmp_class_f32_e64 s[0:1], v0, 3
-; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
-; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
+; SI-NEXT:    v_cmp_class_f32_e64 s[4:5], v0, 3
+; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[4:5]
+; SI-NEXT:    buffer_store_dword v0, off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
   %tid = call i32 @llvm.amdgcn.workitem.id.x() #1
   %gep.in = getelementptr float, ptr addrspace(1) %in, i32 %tid
@@ -522,21 +520,19 @@ define amdgpu_kernel void @test_fold_or3_class_f32_0(ptr addrspace(1) %out, ptr 
 ; SI-LABEL: test_fold_or3_class_f32_0:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
-; SI-NEXT:    s_mov_b32 s10, 0
 ; SI-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
 ; SI-NEXT:    v_mov_b32_e32 v1, 0
-; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b64 s[8:9], s[2:3]
-; SI-NEXT:    buffer_load_dword v0, v[0:1], s[8:11], 0 addr64
-; SI-NEXT:    s_mov_b32 s6, -1
-; SI-NEXT:    s_mov_b32 s4, s0
-; SI-NEXT:    s_mov_b32 s5, s1
+; SI-NEXT:    s_mov_b64 s[4:5], s[2:3]
+; SI-NEXT:    s_mov_b32 s3, 0xf000
+; SI-NEXT:    s_mov_b32 s6, 0
+; SI-NEXT:    s_mov_b32 s7, s3
+; SI-NEXT:    buffer_load_dword v0, v[0:1], s[4:7], 0 addr64
+; SI-NEXT:    s_mov_b32 s2, -1
 ; SI-NEXT:    s_waitcnt vmcnt(0)
-; SI-NEXT:    v_cmp_class_f32_e64 s[0:1], v0, 7
-; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
-; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
+; SI-NEXT:    v_cmp_class_f32_e64 s[4:5], v0, 7
+; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[4:5]
+; SI-NEXT:    buffer_store_dword v0, off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
   %tid = call i32 @llvm.amdgcn.workitem.id.x() #1
   %gep.in = getelementptr float, ptr addrspace(1) %in, i32 %tid
@@ -558,22 +554,20 @@ define amdgpu_kernel void @test_fold_or_all_tests_class_f32_0(ptr addrspace(1) %
 ; SI-LABEL: test_fold_or_all_tests_class_f32_0:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
-; SI-NEXT:    s_mov_b32 s10, 0
 ; SI-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
 ; SI-NEXT:    v_mov_b32_e32 v1, 0
-; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b64 s[8:9], s[2:3]
-; SI-NEXT:    buffer_load_dword v0, v[0:1], s[8:11], 0 addr64
-; SI-NEXT:    s_mov_b32 s6, -1
-; SI-NEXT:    s_movk_i32 s2, 0x3ff
-; SI-NEXT:    s_mov_b32 s4, s0
-; SI-NEXT:    s_mov_b32 s5, s1
+; SI-NEXT:    s_mov_b64 s[4:5], s[2:3]
+; SI-NEXT:    s_mov_b32 s3, 0xf000
+; SI-NEXT:    s_mov_b32 s6, 0
+; SI-NEXT:    s_mov_b32 s7, s3
+; SI-NEXT:    buffer_load_dword v0, v[0:1], s[4:7], 0 addr64
+; SI-NEXT:    s_mov_b32 s2, -1
+; SI-NEXT:    s_movk_i32 s4, 0x3ff
 ; SI-NEXT:    s_waitcnt vmcnt(0)
-; SI-NEXT:    v_cmp_class_f32_e64 s[0:1], v0, s2
-; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
-; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
+; SI-NEXT:    v_cmp_class_f32_e64 s[4:5], v0, s4
+; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[4:5]
+; SI-NEXT:    buffer_store_dword v0, off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
   %tid = call i32 @llvm.amdgcn.workitem.id.x() #1
   %gep.in = getelementptr float, ptr addrspace(1) %in, i32 %tid
@@ -608,21 +602,19 @@ define amdgpu_kernel void @test_fold_or_class_f32_1(ptr addrspace(1) %out, ptr a
 ; SI-LABEL: test_fold_or_class_f32_1:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
-; SI-NEXT:    s_mov_b32 s10, 0
 ; SI-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
 ; SI-NEXT:    v_mov_b32_e32 v1, 0
-; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b64 s[8:9], s[2:3]
-; SI-NEXT:    buffer_load_dword v0, v[0:1], s[8:11], 0 addr64
-; SI-NEXT:    s_mov_b32 s6, -1
-; SI-NEXT:    s_mov_b32 s4, s0
-; SI-NEXT:    s_mov_b32 s5, s1
+; SI-NEXT:    s_mov_b64 s[4:5], s[2:3]
+; SI-NEXT:    s_mov_b32 s3, 0xf000
+; SI-NEXT:    s_mov_b32 s6, 0
+; SI-NEXT:    s_mov_b32 s7, s3
+; SI-NEXT:    buffer_load_dword v0, v[0:1], s[4:7], 0 addr64
+; SI-NEXT:    s_mov_b32 s2, -1
 ; SI-NEXT:    s_waitcnt vmcnt(0)
-; SI-NEXT:    v_cmp_class_f32_e64 s[0:1], v0, 12
-; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
-; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
+; SI-NEXT:    v_cmp_class_f32_e64 s[4:5], v0, 12
+; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[4:5]
+; SI-NEXT:    buffer_store_dword v0, off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
   %tid = call i32 @llvm.amdgcn.workitem.id.x() #1
   %gep.in = getelementptr float, ptr addrspace(1) %in, i32 %tid
@@ -642,21 +634,19 @@ define amdgpu_kernel void @test_fold_or_class_f32_2(ptr addrspace(1) %out, ptr a
 ; SI-LABEL: test_fold_or_class_f32_2:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
-; SI-NEXT:    s_mov_b32 s10, 0
 ; SI-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
 ; SI-NEXT:    v_mov_b32_e32 v1, 0
-; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b64 s[8:9], s[2:3]
-; SI-NEXT:    buffer_load_dword v0, v[0:1], s[8:11], 0 addr64
-; SI-NEXT:    s_mov_b32 s6, -1
-; SI-NEXT:    s_mov_b32 s4, s0
-; SI-NEXT:    s_mov_b32 s5, s1
+; SI-NEXT:    s_mov_b64 s[4:5], s[2:3]
+; SI-NEXT:    s_mov_b32 s3, 0xf000
+; SI-NEXT:    s_mov_b32 s6, 0
+; SI-NEXT:    s_mov_b32 s7, s3
+; SI-NEXT:    buffer_load_dword v0, v[0:1], s[4:7], 0 addr64
+; SI-NEXT:    s_mov_b32 s2, -1
 ; SI-NEXT:    s_waitcnt vmcnt(0)
-; SI-NEXT:    v_cmp_class_f32_e64 s[0:1], v0, 7
-; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
-; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
+; SI-NEXT:    v_cmp_class_f32_e64 s[4:5], v0, 7
+; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[4:5]
+; SI-NEXT:    buffer_store_dword v0, off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
   %tid = call i32 @llvm.amdgcn.workitem.id.x() #1
   %gep.in = getelementptr float, ptr addrspace(1) %in, i32 %tid
@@ -676,24 +666,22 @@ define amdgpu_kernel void @test_no_fold_or_class_f32_0(ptr addrspace(1) %out, pt
 ; SI-LABEL: test_no_fold_or_class_f32_0:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_load_dword s12, s[4:5], 0xd
-; SI-NEXT:    s_mov_b32 s7, 0xf000
-; SI-NEXT:    s_mov_b32 s10, 0
+; SI-NEXT:    s_load_dword s8, s[4:5], 0xd
 ; SI-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
 ; SI-NEXT:    v_mov_b32_e32 v1, 0
-; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b64 s[8:9], s[2:3]
-; SI-NEXT:    buffer_load_dword v0, v[0:1], s[8:11], 0 addr64
-; SI-NEXT:    s_mov_b32 s6, -1
-; SI-NEXT:    s_mov_b32 s4, s0
-; SI-NEXT:    s_mov_b32 s5, s1
-; SI-NEXT:    v_cmp_class_f32_e64 s[0:1], s12, 8
+; SI-NEXT:    s_mov_b64 s[4:5], s[2:3]
+; SI-NEXT:    s_mov_b32 s3, 0xf000
+; SI-NEXT:    s_mov_b32 s6, 0
+; SI-NEXT:    s_mov_b32 s7, s3
+; SI-NEXT:    buffer_load_dword v0, v[0:1], s[4:7], 0 addr64
+; SI-NEXT:    s_mov_b32 s2, -1
+; SI-NEXT:    v_cmp_class_f32_e64 s[4:5], s8, 8
 ; SI-NEXT:    s_waitcnt vmcnt(0)
-; SI-NEXT:    v_cmp_class_f32_e64 s[2:3], v0, 4
-; SI-NEXT:    s_or_b64 s[0:1], s[2:3], s[0:1]
-; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[0:1]
-; SI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
+; SI-NEXT:    v_cmp_class_f32_e64 s[6:7], v0, 4
+; SI-NEXT:    s_or_b64 s[4:5], s[6:7], s[4:5]
+; SI-NEXT:    v_cndmask_b32_e64 v0, 0, -1, s[4:5]
+; SI-NEXT:    buffer_store_dword v0, off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
   %tid = call i32 @llvm.amdgcn.workitem.id.x() #1
   %gep.in = getelementptr float, ptr addrspace(1) %in, i32 %tid

@@ -176,12 +176,12 @@ define amdgpu_kernel void @widen_i17_constant_load(ptr addrspace(4) %arg) {
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
 ; SI-NEXT:    s_add_i32 s4, s4, 34
 ; SI-NEXT:    s_or_b32 s4, s4, 4
+; SI-NEXT:    s_bfe_u32 s5, s4, 0x10010
 ; SI-NEXT:    v_mov_b32_e32 v0, s4
-; SI-NEXT:    s_bfe_u32 s4, s4, 0x10010
 ; SI-NEXT:    buffer_store_short v0, off, s[0:3], 0
 ; SI-NEXT:    s_mov_b64 s[0:1], 2
 ; SI-NEXT:    s_waitcnt expcnt(0)
-; SI-NEXT:    v_mov_b32_e32 v0, s4
+; SI-NEXT:    v_mov_b32_e32 v0, s5
 ; SI-NEXT:    buffer_store_byte v0, off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
 ;
@@ -197,10 +197,10 @@ define amdgpu_kernel void @widen_i17_constant_load(ptr addrspace(4) %arg) {
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
 ; VI-NEXT:    s_add_i32 s0, s0, 34
 ; VI-NEXT:    s_or_b32 s0, s0, 4
+; VI-NEXT:    s_bfe_u32 s1, s0, 0x10010
 ; VI-NEXT:    v_mov_b32_e32 v4, s0
-; VI-NEXT:    s_bfe_u32 s0, s0, 0x10010
 ; VI-NEXT:    flat_store_short v[0:1], v4
-; VI-NEXT:    v_mov_b32_e32 v0, s0
+; VI-NEXT:    v_mov_b32_e32 v0, s1
 ; VI-NEXT:    flat_store_byte v[2:3], v0
 ; VI-NEXT:    s_endpgm
 ;
@@ -215,9 +215,9 @@ define amdgpu_kernel void @widen_i17_constant_load(ptr addrspace(4) %arg) {
 ; GFX11-NEXT:    s_delay_alu instid0(SALU_CYCLE_1) | instskip(NEXT) | instid1(SALU_CYCLE_1)
 ; GFX11-NEXT:    s_or_b32 s0, s0, 4
 ; GFX11-NEXT:    v_dual_mov_b32 v1, 0 :: v_dual_mov_b32 v4, s0
-; GFX11-NEXT:    s_and_b32 s0, s0, 0x1ffff
+; GFX11-NEXT:    s_and_b32 s1, s0, 0x1ffff
 ; GFX11-NEXT:    s_delay_alu instid0(SALU_CYCLE_1)
-; GFX11-NEXT:    v_dual_mov_b32 v2, 2 :: v_dual_mov_b32 v5, s0
+; GFX11-NEXT:    v_dual_mov_b32 v2, 2 :: v_dual_mov_b32 v5, s1
 ; GFX11-NEXT:    v_mov_b32_e32 v3, 0
 ; GFX11-NEXT:    s_clause 0x1
 ; GFX11-NEXT:    global_store_b16 v[0:1], v4, off

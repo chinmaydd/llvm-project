@@ -37,8 +37,8 @@ define amdgpu_kernel void @fmuladd_f16(ptr addrspace(1) %out, ptr addrspace(1) %
 ; VI-FLUSH-NEXT:    flat_load_ushort v6, v[0:1]
 ; VI-FLUSH-NEXT:    flat_load_ushort v2, v[2:3]
 ; VI-FLUSH-NEXT:    flat_load_ushort v3, v[4:5]
-; VI-FLUSH-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-FLUSH-NEXT:    v_mov_b32_e32 v1, s1
+; VI-FLUSH-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-FLUSH-NEXT:    s_waitcnt vmcnt(0)
 ; VI-FLUSH-NEXT:    v_mac_f16_e32 v3, v6, v2
 ; VI-FLUSH-NEXT:    flat_store_short v[0:1], v3
@@ -57,8 +57,8 @@ define amdgpu_kernel void @fmuladd_f16(ptr addrspace(1) %out, ptr addrspace(1) %
 ; VI-DENORM-NEXT:    flat_load_ushort v6, v[0:1]
 ; VI-DENORM-NEXT:    flat_load_ushort v2, v[2:3]
 ; VI-DENORM-NEXT:    flat_load_ushort v3, v[4:5]
-; VI-DENORM-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-DENORM-NEXT:    v_mov_b32_e32 v1, s1
+; VI-DENORM-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-DENORM-NEXT:    s_waitcnt vmcnt(0)
 ; VI-DENORM-NEXT:    v_fma_f16 v2, v6, v2, v3
 ; VI-DENORM-NEXT:    flat_store_short v[0:1], v2
@@ -206,8 +206,8 @@ define amdgpu_kernel void @fmul_fadd_f16(ptr addrspace(1) %out, ptr addrspace(1)
 ; VI-FLUSH-NEXT:    flat_load_ushort v6, v[0:1]
 ; VI-FLUSH-NEXT:    flat_load_ushort v2, v[2:3]
 ; VI-FLUSH-NEXT:    flat_load_ushort v3, v[4:5]
-; VI-FLUSH-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-FLUSH-NEXT:    v_mov_b32_e32 v1, s1
+; VI-FLUSH-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-FLUSH-NEXT:    s_waitcnt vmcnt(0)
 ; VI-FLUSH-NEXT:    v_mac_f16_e32 v3, v6, v2
 ; VI-FLUSH-NEXT:    flat_store_short v[0:1], v3
@@ -226,8 +226,8 @@ define amdgpu_kernel void @fmul_fadd_f16(ptr addrspace(1) %out, ptr addrspace(1)
 ; VI-DENORM-CONTRACT-NEXT:    flat_load_ushort v6, v[0:1]
 ; VI-DENORM-CONTRACT-NEXT:    flat_load_ushort v2, v[2:3]
 ; VI-DENORM-CONTRACT-NEXT:    flat_load_ushort v3, v[4:5]
-; VI-DENORM-CONTRACT-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-DENORM-CONTRACT-NEXT:    v_mov_b32_e32 v1, s1
+; VI-DENORM-CONTRACT-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-DENORM-CONTRACT-NEXT:    s_waitcnt vmcnt(0)
 ; VI-DENORM-CONTRACT-NEXT:    v_fma_f16 v2, v6, v2, v3
 ; VI-DENORM-CONTRACT-NEXT:    flat_store_short v[0:1], v2
@@ -398,8 +398,8 @@ define amdgpu_kernel void @fmul_fadd_contract_f16(ptr addrspace(1) %out, ptr add
 ; VI-FLUSH-NEXT:    flat_load_ushort v6, v[0:1]
 ; VI-FLUSH-NEXT:    flat_load_ushort v2, v[2:3]
 ; VI-FLUSH-NEXT:    flat_load_ushort v3, v[4:5]
-; VI-FLUSH-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-FLUSH-NEXT:    v_mov_b32_e32 v1, s1
+; VI-FLUSH-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-FLUSH-NEXT:    s_waitcnt vmcnt(0)
 ; VI-FLUSH-NEXT:    v_mac_f16_e32 v3, v6, v2
 ; VI-FLUSH-NEXT:    flat_store_short v[0:1], v3
@@ -418,8 +418,8 @@ define amdgpu_kernel void @fmul_fadd_contract_f16(ptr addrspace(1) %out, ptr add
 ; VI-DENORM-NEXT:    flat_load_ushort v6, v[0:1]
 ; VI-DENORM-NEXT:    flat_load_ushort v2, v[2:3]
 ; VI-DENORM-NEXT:    flat_load_ushort v3, v[4:5]
-; VI-DENORM-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-DENORM-NEXT:    v_mov_b32_e32 v1, s1
+; VI-DENORM-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-DENORM-NEXT:    s_waitcnt vmcnt(0)
 ; VI-DENORM-NEXT:    v_fma_f16 v2, v6, v2, v3
 ; VI-DENORM-NEXT:    flat_store_short v[0:1], v2

@@ -277,9 +277,9 @@ define amdgpu_kernel void @local_address_store(ptr addrspace(3) %out, i32 %val) 
 ; GFX7-NEXT:    s_load_dwordx2 s[0:1], s[4:5], 0x9
 ; GFX7-NEXT:    s_mov_b32 m0, -1
 ; GFX7-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX7-NEXT:    v_mov_b32_e32 v0, s0
-; GFX7-NEXT:    v_mov_b32_e32 v1, s1
-; GFX7-NEXT:    ds_write_b32 v0, v1
+; GFX7-NEXT:    v_mov_b32_e32 v0, s1
+; GFX7-NEXT:    v_mov_b32_e32 v1, s0
+; GFX7-NEXT:    ds_write_b32 v1, v0
 ; GFX7-NEXT:    s_endpgm
 ;
 ; GFX8-LABEL: local_address_store:
@@ -287,9 +287,9 @@ define amdgpu_kernel void @local_address_store(ptr addrspace(3) %out, i32 %val) 
 ; GFX8-NEXT:    s_load_dwordx2 s[0:1], s[4:5], 0x24
 ; GFX8-NEXT:    s_mov_b32 m0, -1
 ; GFX8-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX8-NEXT:    v_mov_b32_e32 v0, s0
-; GFX8-NEXT:    v_mov_b32_e32 v1, s1
-; GFX8-NEXT:    ds_write_b32 v0, v1
+; GFX8-NEXT:    v_mov_b32_e32 v0, s1
+; GFX8-NEXT:    v_mov_b32_e32 v1, s0
+; GFX8-NEXT:    ds_write_b32 v1, v0
 ; GFX8-NEXT:    s_endpgm
   store i32 %val, ptr addrspace(3) %out
   ret void
@@ -332,9 +332,9 @@ define amdgpu_kernel void @local_address_gep_const_offset_store(ptr addrspace(3)
 ; GFX7-NEXT:    s_load_dwordx2 s[0:1], s[4:5], 0x9
 ; GFX7-NEXT:    s_mov_b32 m0, -1
 ; GFX7-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX7-NEXT:    v_mov_b32_e32 v0, s0
-; GFX7-NEXT:    v_mov_b32_e32 v1, s1
-; GFX7-NEXT:    ds_write_b32 v0, v1 offset:4
+; GFX7-NEXT:    v_mov_b32_e32 v0, s1
+; GFX7-NEXT:    v_mov_b32_e32 v1, s0
+; GFX7-NEXT:    ds_write_b32 v1, v0 offset:4
 ; GFX7-NEXT:    s_endpgm
 ;
 ; GFX8-LABEL: local_address_gep_const_offset_store:
@@ -342,9 +342,9 @@ define amdgpu_kernel void @local_address_gep_const_offset_store(ptr addrspace(3)
 ; GFX8-NEXT:    s_load_dwordx2 s[0:1], s[4:5], 0x24
 ; GFX8-NEXT:    s_mov_b32 m0, -1
 ; GFX8-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX8-NEXT:    v_mov_b32_e32 v0, s0
-; GFX8-NEXT:    v_mov_b32_e32 v1, s1
-; GFX8-NEXT:    ds_write_b32 v0, v1 offset:4
+; GFX8-NEXT:    v_mov_b32_e32 v0, s1
+; GFX8-NEXT:    v_mov_b32_e32 v1, s0
+; GFX8-NEXT:    ds_write_b32 v1, v0 offset:4
 ; GFX8-NEXT:    s_endpgm
   %gep = getelementptr i32, ptr addrspace(3) %out, i32 1
   store i32 %val, ptr addrspace(3) %gep, align 4

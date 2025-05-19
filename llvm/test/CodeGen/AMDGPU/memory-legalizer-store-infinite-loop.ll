@@ -18,13 +18,13 @@ define amdgpu_kernel void @_Z6brokenPd(ptr %arg) {
 ; GCN-NEXT:    v_mov_b32_e32 v2, 0
 ; GCN-NEXT:    v_mov_b32_e32 v3, 0x7ff80000
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
+; GCN-NEXT:    s_add_u32 s6, s4, 4
+; GCN-NEXT:    s_addc_u32 s7, s5, 0
 ; GCN-NEXT:    v_mov_b32_e32 v0, s4
 ; GCN-NEXT:    v_mov_b32_e32 v1, s5
-; GCN-NEXT:    s_add_u32 s4, s4, 4
-; GCN-NEXT:    s_addc_u32 s5, s5, 0
 ; GCN-NEXT:    flat_store_dword v[0:1], v2
-; GCN-NEXT:    v_mov_b32_e32 v0, s4
-; GCN-NEXT:    v_mov_b32_e32 v1, s5
+; GCN-NEXT:    v_mov_b32_e32 v0, s6
+; GCN-NEXT:    v_mov_b32_e32 v1, s7
 ; GCN-NEXT:    flat_store_dword v[0:1], v3
 ; GCN-NEXT:    s_endpgm
 bb:

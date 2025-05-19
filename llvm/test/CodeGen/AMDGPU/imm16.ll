@@ -1230,8 +1230,8 @@ define amdgpu_kernel void @commute_add_inline_imm_0.5_f16(ptr addrspace(1) %out,
 ; GFX10-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x03,0x8a,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x03,0x8b,0xbe]
 ; GFX10-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0xc0,0x8c,0xbf]
-; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x03,0x89,0xbe]
+; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x03,0x84,0xbe]
 ; GFX10-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x28,0xe0,0x00,0x00,0x02,0x80]
 ; GFX10-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x03,0x85,0xbe]
@@ -1248,8 +1248,8 @@ define amdgpu_kernel void @commute_add_inline_imm_0.5_f16(ptr addrspace(1) %out,
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; GFX11-TRUE16-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x07,0xfc,0x89,0xbf]
-; GFX11-TRUE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; GFX11-TRUE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; GFX11-TRUE16-NEXT:    buffer_load_u16 v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1266,8 +1266,8 @@ define amdgpu_kernel void @commute_add_inline_imm_0.5_f16(ptr addrspace(1) %out,
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; GFX11-FAKE16-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x07,0xfc,0x89,0xbf]
-; GFX11-FAKE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; GFX11-FAKE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; GFX11-FAKE16-NEXT:    buffer_load_u16 v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1279,13 +1279,13 @@ define amdgpu_kernel void @commute_add_inline_imm_0.5_f16(ptr addrspace(1) %out,
 ; VI-LABEL: commute_add_inline_imm_0.5_f16:
 ; VI:       ; %bb.0:
 ; VI-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0 ; encoding: [0x04,0x00,0x0a,0xc0,0x00,0x00,0x00,0x00]
-; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s6, -1 ; encoding: [0xc1,0x00,0x86,0xbe]
+; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; VI-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; VI-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0x00,0x8c,0xbf]
-; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; VI-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; VI-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1297,13 +1297,13 @@ define amdgpu_kernel void @commute_add_inline_imm_0.5_f16(ptr addrspace(1) %out,
 ; SI-LABEL: commute_add_inline_imm_0.5_f16:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s6, -1
+; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s10, s6
 ; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    s_mov_b32 s9, s3
+; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0
 ; SI-NEXT:    s_mov_b32 s4, s0
 ; SI-NEXT:    s_mov_b32 s5, s1
@@ -1328,8 +1328,8 @@ define amdgpu_kernel void @commute_add_literal_f16(ptr addrspace(1) %out, ptr ad
 ; GFX10-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x03,0x8a,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x03,0x8b,0xbe]
 ; GFX10-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0xc0,0x8c,0xbf]
-; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x03,0x89,0xbe]
+; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x03,0x84,0xbe]
 ; GFX10-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x28,0xe0,0x00,0x00,0x02,0x80]
 ; GFX10-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x03,0x85,0xbe]
@@ -1346,8 +1346,8 @@ define amdgpu_kernel void @commute_add_literal_f16(ptr addrspace(1) %out, ptr ad
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; GFX11-TRUE16-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x07,0xfc,0x89,0xbf]
-; GFX11-TRUE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; GFX11-TRUE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; GFX11-TRUE16-NEXT:    buffer_load_u16 v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; GFX11-TRUE16-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1364,8 +1364,8 @@ define amdgpu_kernel void @commute_add_literal_f16(ptr addrspace(1) %out, ptr ad
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; GFX11-FAKE16-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x07,0xfc,0x89,0xbf]
-; GFX11-FAKE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; GFX11-FAKE16-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; GFX11-FAKE16-NEXT:    buffer_load_u16 v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; GFX11-FAKE16-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1377,13 +1377,13 @@ define amdgpu_kernel void @commute_add_literal_f16(ptr addrspace(1) %out, ptr ad
 ; VI-LABEL: commute_add_literal_f16:
 ; VI:       ; %bb.0:
 ; VI-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0 ; encoding: [0x04,0x00,0x0a,0xc0,0x00,0x00,0x00,0x00]
-; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s6, -1 ; encoding: [0xc1,0x00,0x86,0xbe]
+; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; VI-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; VI-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0x00,0x8c,0xbf]
-; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; VI-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; VI-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1395,13 +1395,13 @@ define amdgpu_kernel void @commute_add_literal_f16(ptr addrspace(1) %out, ptr ad
 ; SI-LABEL: commute_add_literal_f16:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s6, -1
+; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s10, s6
 ; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    s_mov_b32 s9, s3
+; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0
 ; SI-NEXT:    s_mov_b32 s4, s0
 ; SI-NEXT:    s_mov_b32 s5, s1
@@ -1624,8 +1624,8 @@ define amdgpu_kernel void @add_inline_imm_neg_1_f16(ptr addrspace(1) %out, ptr a
 ; GFX10-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x03,0x8a,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x03,0x8b,0xbe]
 ; GFX10-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0xc0,0x8c,0xbf]
-; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x03,0x89,0xbe]
+; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x03,0x84,0xbe]
 ; GFX10-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x28,0xe0,0x00,0x00,0x02,0x80]
 ; GFX10-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x03,0x85,0xbe]
@@ -1642,8 +1642,8 @@ define amdgpu_kernel void @add_inline_imm_neg_1_f16(ptr addrspace(1) %out, ptr a
 ; GFX11-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; GFX11-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x07,0xfc,0x89,0xbf]
-; GFX11-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; GFX11-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; GFX11-NEXT:    buffer_load_u16 v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; GFX11-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1655,13 +1655,13 @@ define amdgpu_kernel void @add_inline_imm_neg_1_f16(ptr addrspace(1) %out, ptr a
 ; VI-LABEL: add_inline_imm_neg_1_f16:
 ; VI:       ; %bb.0:
 ; VI-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0 ; encoding: [0x04,0x00,0x0a,0xc0,0x00,0x00,0x00,0x00]
-; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s6, -1 ; encoding: [0xc1,0x00,0x86,0xbe]
+; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; VI-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; VI-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0x00,0x8c,0xbf]
-; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; VI-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; VI-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1673,13 +1673,13 @@ define amdgpu_kernel void @add_inline_imm_neg_1_f16(ptr addrspace(1) %out, ptr a
 ; SI-LABEL: add_inline_imm_neg_1_f16:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s6, -1
+; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s10, s6
 ; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    s_mov_b32 s9, s3
+; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0
 ; SI-NEXT:    s_mov_b32 s4, s0
 ; SI-NEXT:    s_mov_b32 s5, s1
@@ -1703,8 +1703,8 @@ define amdgpu_kernel void @add_inline_imm_neg_2_f16(ptr addrspace(1) %out, ptr a
 ; GFX10-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x03,0x8a,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x03,0x8b,0xbe]
 ; GFX10-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0xc0,0x8c,0xbf]
-; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x03,0x89,0xbe]
+; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x03,0x84,0xbe]
 ; GFX10-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x28,0xe0,0x00,0x00,0x02,0x80]
 ; GFX10-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x03,0x85,0xbe]
@@ -1721,8 +1721,8 @@ define amdgpu_kernel void @add_inline_imm_neg_2_f16(ptr addrspace(1) %out, ptr a
 ; GFX11-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; GFX11-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x07,0xfc,0x89,0xbf]
-; GFX11-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; GFX11-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; GFX11-NEXT:    buffer_load_u16 v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; GFX11-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1734,13 +1734,13 @@ define amdgpu_kernel void @add_inline_imm_neg_2_f16(ptr addrspace(1) %out, ptr a
 ; VI-LABEL: add_inline_imm_neg_2_f16:
 ; VI:       ; %bb.0:
 ; VI-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0 ; encoding: [0x04,0x00,0x0a,0xc0,0x00,0x00,0x00,0x00]
-; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s6, -1 ; encoding: [0xc1,0x00,0x86,0xbe]
+; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; VI-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; VI-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0x00,0x8c,0xbf]
-; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; VI-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; VI-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1752,13 +1752,13 @@ define amdgpu_kernel void @add_inline_imm_neg_2_f16(ptr addrspace(1) %out, ptr a
 ; SI-LABEL: add_inline_imm_neg_2_f16:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s6, -1
+; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s10, s6
 ; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    s_mov_b32 s9, s3
+; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0
 ; SI-NEXT:    s_mov_b32 s4, s0
 ; SI-NEXT:    s_mov_b32 s5, s1
@@ -1782,8 +1782,8 @@ define amdgpu_kernel void @add_inline_imm_neg_16_f16(ptr addrspace(1) %out, ptr 
 ; GFX10-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x03,0x8a,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x03,0x8b,0xbe]
 ; GFX10-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0xc0,0x8c,0xbf]
-; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x03,0x89,0xbe]
+; GFX10-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x03,0x88,0xbe]
 ; GFX10-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x03,0x84,0xbe]
 ; GFX10-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x28,0xe0,0x00,0x00,0x02,0x80]
 ; GFX10-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x03,0x85,0xbe]
@@ -1800,8 +1800,8 @@ define amdgpu_kernel void @add_inline_imm_neg_16_f16(ptr addrspace(1) %out, ptr 
 ; GFX11-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; GFX11-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x07,0xfc,0x89,0xbf]
-; GFX11-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; GFX11-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; GFX11-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; GFX11-NEXT:    buffer_load_u16 v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; GFX11-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1813,13 +1813,13 @@ define amdgpu_kernel void @add_inline_imm_neg_16_f16(ptr addrspace(1) %out, ptr 
 ; VI-LABEL: add_inline_imm_neg_16_f16:
 ; VI:       ; %bb.0:
 ; VI-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0 ; encoding: [0x04,0x00,0x0a,0xc0,0x00,0x00,0x00,0x00]
-; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s6, -1 ; encoding: [0xc1,0x00,0x86,0xbe]
+; VI-NEXT:    s_mov_b32 s7, 0x1100f000 ; encoding: [0xff,0x00,0x87,0xbe,0x00,0xf0,0x00,0x11]
 ; VI-NEXT:    s_mov_b32 s10, s6 ; encoding: [0x06,0x00,0x8a,0xbe]
 ; VI-NEXT:    s_mov_b32 s11, s7 ; encoding: [0x07,0x00,0x8b,0xbe]
 ; VI-NEXT:    s_waitcnt lgkmcnt(0) ; encoding: [0x7f,0x00,0x8c,0xbf]
-; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    s_mov_b32 s9, s3 ; encoding: [0x03,0x00,0x89,0xbe]
+; VI-NEXT:    s_mov_b32 s8, s2 ; encoding: [0x02,0x00,0x88,0xbe]
 ; VI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0 ; encoding: [0x00,0x00,0x48,0xe0,0x00,0x00,0x02,0x80]
 ; VI-NEXT:    s_mov_b32 s4, s0 ; encoding: [0x00,0x00,0x84,0xbe]
 ; VI-NEXT:    s_mov_b32 s5, s1 ; encoding: [0x01,0x00,0x85,0xbe]
@@ -1831,13 +1831,13 @@ define amdgpu_kernel void @add_inline_imm_neg_16_f16(ptr addrspace(1) %out, ptr 
 ; SI-LABEL: add_inline_imm_neg_16_f16:
 ; SI:       ; %bb.0:
 ; SI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
-; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s6, -1
+; SI-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-NEXT:    s_mov_b32 s10, s6
 ; SI-NEXT:    s_mov_b32 s11, s7
 ; SI-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    s_mov_b32 s9, s3
+; SI-NEXT:    s_mov_b32 s8, s2
 ; SI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0
 ; SI-NEXT:    s_mov_b32 s4, s0
 ; SI-NEXT:    s_mov_b32 s5, s1

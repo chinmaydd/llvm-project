@@ -24,8 +24,8 @@ define amdgpu_kernel void @v_test_add_v2i16(ptr addrspace(1) %out, ptr addrspace
 ; VI-NEXT:    s_waitcnt vmcnt(0)
 ; VI-NEXT:    flat_load_dword v2, v[2:3] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_add_u16_e32 v3, v4, v2
 ; VI-NEXT:    v_add_u16_sdwa v2, v4, v2 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
 ; VI-NEXT:    v_or_b32_e32 v2, v3, v2
@@ -99,8 +99,8 @@ define amdgpu_kernel void @s_test_add_v2i16(ptr addrspace(1) %out, ptr addrspace
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
 ; VI-NEXT:    s_load_dword s2, s[2:3], 0x0
 ; VI-NEXT:    s_load_dword s3, s[4:5], 0x0
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
 ; VI-NEXT:    s_add_i32 s0, s2, s3
 ; VI-NEXT:    s_lshr_b32 s1, s3, 16
@@ -282,8 +282,8 @@ define amdgpu_kernel void @v_test_add_v2i16_constant(ptr addrspace(1) %out, ptr 
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
 ; VI-NEXT:    flat_load_dword v2, v[0:1] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_add_u16_e32 v4, 0x7b, v2
 ; VI-NEXT:    v_add_u16_sdwa v2, v2, v3 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:DWORD
 ; VI-NEXT:    v_or_b32_e32 v2, v4, v2
@@ -349,8 +349,8 @@ define amdgpu_kernel void @v_test_add_v2i16_neg_constant(ptr addrspace(1) %out, 
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
 ; VI-NEXT:    flat_load_dword v2, v[0:1] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_add_u16_e32 v4, 0xfcb3, v2
 ; VI-NEXT:    v_add_u16_sdwa v2, v2, v3 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:DWORD
 ; VI-NEXT:    v_or_b32_e32 v2, v4, v2
@@ -415,8 +415,8 @@ define amdgpu_kernel void @v_test_add_v2i16_inline_neg1(ptr addrspace(1) %out, p
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
 ; VI-NEXT:    flat_load_dword v2, v[0:1] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_add_u16_e32 v4, -1, v2
 ; VI-NEXT:    v_add_u16_sdwa v2, v2, v3 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:DWORD
 ; VI-NEXT:    v_or_b32_e32 v2, v4, v2
@@ -479,8 +479,8 @@ define amdgpu_kernel void @v_test_add_v2i16_inline_lo_zero_hi(ptr addrspace(1) %
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
 ; VI-NEXT:    flat_load_dword v2, v[0:1] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_and_b32_e32 v3, 0xffff0000, v2
 ; VI-NEXT:    v_add_u16_e32 v2, 32, v2
 ; VI-NEXT:    v_or_b32_e32 v2, v2, v3
@@ -545,8 +545,8 @@ define amdgpu_kernel void @v_test_add_v2i16_inline_fp_split(ptr addrspace(1) %ou
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
 ; VI-NEXT:    flat_load_dword v2, v[0:1] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_add_u16_sdwa v3, v2, v3 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:DWORD
 ; VI-NEXT:    v_or_b32_sdwa v2, v2, v3 dst_sel:DWORD dst_unused:UNUSED_PAD src0_sel:WORD_0 src1_sel:DWORD
 ; VI-NEXT:    flat_store_dword v[0:1], v2
@@ -615,8 +615,8 @@ define amdgpu_kernel void @v_test_add_v2i16_zext_to_v2i32(ptr addrspace(1) %out,
 ; VI-NEXT:    s_waitcnt vmcnt(0)
 ; VI-NEXT:    flat_load_dword v3, v[2:3] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_add_u16_e32 v2, v4, v3
 ; VI-NEXT:    v_add_u16_sdwa v3, v4, v3 dst_sel:DWORD dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
 ; VI-NEXT:    flat_store_dwordx2 v[0:1], v[2:3]
@@ -662,20 +662,21 @@ define amdgpu_kernel void @v_test_add_v2i16_zext_to_v2i32(ptr addrspace(1) %out,
 ; GFX11-TRUE16-NEXT:    s_clause 0x1
 ; GFX11-TRUE16-NEXT:    s_load_b128 s[0:3], s[4:5], 0x24
 ; GFX11-TRUE16-NEXT:    s_load_b64 s[4:5], s[4:5], 0x34
-; GFX11-TRUE16-NEXT:    v_dual_mov_b32 v3, 0 :: v_dual_and_b32 v0, 0x3ff, v0
-; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_1)
+; GFX11-TRUE16-NEXT:    v_and_b32_e32 v0, 0x3ff, v0
+; GFX11-TRUE16-NEXT:    v_mov_b32_e32 v2, 0
+; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_2)
 ; GFX11-TRUE16-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
 ; GFX11-TRUE16-NEXT:    s_waitcnt lgkmcnt(0)
 ; GFX11-TRUE16-NEXT:    global_load_b32 v1, v0, s[2:3] glc dlc
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0)
 ; GFX11-TRUE16-NEXT:    global_load_b32 v0, v0, s[4:5] glc dlc
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0)
-; GFX11-TRUE16-NEXT:    v_pk_add_u16 v2, v1, v0
+; GFX11-TRUE16-NEXT:    v_pk_add_u16 v0, v1, v0
 ; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.h, 0
-; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_2)
-; GFX11-TRUE16-NEXT:    v_and_b32_e32 v0, 0xffff, v2
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.l, v2.h
-; GFX11-TRUE16-NEXT:    global_store_b64 v3, v[0:1], s[0:1]
+; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_3)
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.l, v0.h
+; GFX11-TRUE16-NEXT:    v_and_b32_e32 v0, 0xffff, v0
+; GFX11-TRUE16-NEXT:    global_store_b64 v2, v[0:1], s[0:1]
 ; GFX11-TRUE16-NEXT:    s_endpgm
 ;
 ; GFX11-FAKE16-LABEL: v_test_add_v2i16_zext_to_v2i32:
@@ -729,8 +730,8 @@ define amdgpu_kernel void @v_test_add_v2i16_zext_to_v2i64(ptr addrspace(1) %out,
 ; VI-NEXT:    flat_load_dword v2, v[2:3] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
 ; VI-NEXT:    v_mov_b32_e32 v1, 0
-; VI-NEXT:    v_mov_b32_e32 v4, s0
 ; VI-NEXT:    v_mov_b32_e32 v5, s1
+; VI-NEXT:    v_mov_b32_e32 v4, s0
 ; VI-NEXT:    v_mov_b32_e32 v3, v1
 ; VI-NEXT:    v_add_u16_e32 v0, v6, v2
 ; VI-NEXT:    v_add_u16_sdwa v2, v6, v2 dst_sel:DWORD dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
@@ -847,8 +848,8 @@ define amdgpu_kernel void @v_test_add_v2i16_sext_to_v2i32(ptr addrspace(1) %out,
 ; VI-NEXT:    s_waitcnt vmcnt(0)
 ; VI-NEXT:    flat_load_dword v2, v[2:3] glc
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_add_u16_sdwa v3, v4, v2 dst_sel:DWORD dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
 ; VI-NEXT:    v_add_u16_e32 v2, v4, v2
 ; VI-NEXT:    v_bfe_i32 v2, v2, 0, 16
@@ -939,8 +940,8 @@ define amdgpu_kernel void @v_test_add_v2i16_sext_to_v2i64(ptr addrspace(1) %out,
 ; VI-NEXT:    v_addc_u32_e32 v3, vcc, 0, v3, vcc
 ; VI-NEXT:    flat_load_dword v0, v[0:1]
 ; VI-NEXT:    flat_load_dword v1, v[2:3]
-; VI-NEXT:    v_mov_b32_e32 v4, s0
 ; VI-NEXT:    v_mov_b32_e32 v5, s1
+; VI-NEXT:    v_mov_b32_e32 v4, s0
 ; VI-NEXT:    s_waitcnt vmcnt(0)
 ; VI-NEXT:    v_add_u16_sdwa v2, v0, v1 dst_sel:DWORD dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
 ; VI-NEXT:    v_add_u16_e32 v0, v0, v1

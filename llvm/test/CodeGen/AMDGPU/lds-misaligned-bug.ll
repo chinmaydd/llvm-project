@@ -873,24 +873,26 @@ define amdgpu_kernel void @test_local_v4_aligned8(ptr addrspace(3) %arg) {
 ; ALIGNED-GFX10:       ; %bb.0: ; %bb
 ; ALIGNED-GFX10-NEXT:    s_load_dword s0, s[4:5], 0x24
 ; ALIGNED-GFX10-NEXT:    s_waitcnt lgkmcnt(0)
-; ALIGNED-GFX10-NEXT:    v_lshl_add_u32 v5, v0, 2, s0
-; ALIGNED-GFX10-NEXT:    ds_read2_b64 v[0:3], v5 offset1:1
+; ALIGNED-GFX10-NEXT:    v_lshl_add_u32 v6, v0, 2, s0
+; ALIGNED-GFX10-NEXT:    ds_read2_b64 v[0:3], v6 offset1:1
 ; ALIGNED-GFX10-NEXT:    s_waitcnt lgkmcnt(0)
-; ALIGNED-GFX10-NEXT:    v_mov_b32_e32 v4, v2
-; ALIGNED-GFX10-NEXT:    v_mov_b32_e32 v2, v0
-; ALIGNED-GFX10-NEXT:    ds_write2_b64 v5, v[3:4], v[1:2] offset1:1
+; ALIGNED-GFX10-NEXT:    v_mov_b32_e32 v4, v1
+; ALIGNED-GFX10-NEXT:    v_mov_b32_e32 v5, v0
+; ALIGNED-GFX10-NEXT:    v_mov_b32_e32 v1, v3
+; ALIGNED-GFX10-NEXT:    ds_write2_b64 v6, v[1:2], v[4:5] offset1:1
 ; ALIGNED-GFX10-NEXT:    s_endpgm
 ;
 ; UNALIGNED-GFX10-LABEL: test_local_v4_aligned8:
 ; UNALIGNED-GFX10:       ; %bb.0: ; %bb
 ; UNALIGNED-GFX10-NEXT:    s_load_dword s0, s[4:5], 0x24
 ; UNALIGNED-GFX10-NEXT:    s_waitcnt lgkmcnt(0)
-; UNALIGNED-GFX10-NEXT:    v_lshl_add_u32 v5, v0, 2, s0
-; UNALIGNED-GFX10-NEXT:    ds_read2_b64 v[0:3], v5 offset1:1
+; UNALIGNED-GFX10-NEXT:    v_lshl_add_u32 v6, v0, 2, s0
+; UNALIGNED-GFX10-NEXT:    ds_read2_b64 v[0:3], v6 offset1:1
 ; UNALIGNED-GFX10-NEXT:    s_waitcnt lgkmcnt(0)
-; UNALIGNED-GFX10-NEXT:    v_mov_b32_e32 v4, v2
-; UNALIGNED-GFX10-NEXT:    v_mov_b32_e32 v2, v0
-; UNALIGNED-GFX10-NEXT:    ds_write2_b64 v5, v[3:4], v[1:2] offset1:1
+; UNALIGNED-GFX10-NEXT:    v_mov_b32_e32 v4, v1
+; UNALIGNED-GFX10-NEXT:    v_mov_b32_e32 v5, v0
+; UNALIGNED-GFX10-NEXT:    v_mov_b32_e32 v1, v3
+; UNALIGNED-GFX10-NEXT:    ds_write2_b64 v6, v[1:2], v[4:5] offset1:1
 ; UNALIGNED-GFX10-NEXT:    s_endpgm
 ;
 ; ALIGNED-GFX11-LABEL: test_local_v4_aligned8:
@@ -899,12 +901,12 @@ define amdgpu_kernel void @test_local_v4_aligned8(ptr addrspace(3) %arg) {
 ; ALIGNED-GFX11-NEXT:    v_and_b32_e32 v0, 0x3ff, v0
 ; ALIGNED-GFX11-NEXT:    s_waitcnt lgkmcnt(0)
 ; ALIGNED-GFX11-NEXT:    s_delay_alu instid0(VALU_DEP_1)
-; ALIGNED-GFX11-NEXT:    v_lshl_add_u32 v5, v0, 2, s0
-; ALIGNED-GFX11-NEXT:    ds_load_2addr_b64 v[0:3], v5 offset1:1
+; ALIGNED-GFX11-NEXT:    v_lshl_add_u32 v6, v0, 2, s0
+; ALIGNED-GFX11-NEXT:    ds_load_2addr_b64 v[0:3], v6 offset1:1
 ; ALIGNED-GFX11-NEXT:    s_waitcnt lgkmcnt(0)
-; ALIGNED-GFX11-NEXT:    v_mov_b32_e32 v4, v2
-; ALIGNED-GFX11-NEXT:    v_mov_b32_e32 v2, v0
-; ALIGNED-GFX11-NEXT:    ds_store_2addr_b64 v5, v[3:4], v[1:2] offset1:1
+; ALIGNED-GFX11-NEXT:    v_dual_mov_b32 v4, v1 :: v_dual_mov_b32 v5, v0
+; ALIGNED-GFX11-NEXT:    v_mov_b32_e32 v1, v3
+; ALIGNED-GFX11-NEXT:    ds_store_2addr_b64 v6, v[1:2], v[4:5] offset1:1
 ; ALIGNED-GFX11-NEXT:    s_endpgm
 ;
 ; UNALIGNED-GFX11-LABEL: test_local_v4_aligned8:
@@ -913,12 +915,12 @@ define amdgpu_kernel void @test_local_v4_aligned8(ptr addrspace(3) %arg) {
 ; UNALIGNED-GFX11-NEXT:    v_and_b32_e32 v0, 0x3ff, v0
 ; UNALIGNED-GFX11-NEXT:    s_waitcnt lgkmcnt(0)
 ; UNALIGNED-GFX11-NEXT:    s_delay_alu instid0(VALU_DEP_1)
-; UNALIGNED-GFX11-NEXT:    v_lshl_add_u32 v5, v0, 2, s0
-; UNALIGNED-GFX11-NEXT:    ds_load_2addr_b64 v[0:3], v5 offset1:1
+; UNALIGNED-GFX11-NEXT:    v_lshl_add_u32 v6, v0, 2, s0
+; UNALIGNED-GFX11-NEXT:    ds_load_2addr_b64 v[0:3], v6 offset1:1
 ; UNALIGNED-GFX11-NEXT:    s_waitcnt lgkmcnt(0)
-; UNALIGNED-GFX11-NEXT:    v_mov_b32_e32 v4, v2
-; UNALIGNED-GFX11-NEXT:    v_mov_b32_e32 v2, v0
-; UNALIGNED-GFX11-NEXT:    ds_store_2addr_b64 v5, v[3:4], v[1:2] offset1:1
+; UNALIGNED-GFX11-NEXT:    v_dual_mov_b32 v4, v1 :: v_dual_mov_b32 v5, v0
+; UNALIGNED-GFX11-NEXT:    v_mov_b32_e32 v1, v3
+; UNALIGNED-GFX11-NEXT:    ds_store_2addr_b64 v6, v[1:2], v[4:5] offset1:1
 ; UNALIGNED-GFX11-NEXT:    s_endpgm
 bb:
   %lid = tail call i32 @llvm.amdgcn.workitem.id.x()
@@ -950,11 +952,11 @@ define amdgpu_kernel void @test_flat_v4_aligned8(ptr %arg) {
 ; SPLIT-NEXT:    flat_load_dwordx2 v[4:5], v[0:1]
 ; SPLIT-NEXT:    flat_load_dwordx2 v[6:7], v[2:3]
 ; SPLIT-NEXT:    s_waitcnt vmcnt(1) lgkmcnt(1)
-; SPLIT-NEXT:    v_mov_b32_e32 v8, v5
 ; SPLIT-NEXT:    v_mov_b32_e32 v9, v4
+; SPLIT-NEXT:    v_mov_b32_e32 v8, v5
 ; SPLIT-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0)
-; SPLIT-NEXT:    v_mov_b32_e32 v4, v7
 ; SPLIT-NEXT:    v_mov_b32_e32 v5, v6
+; SPLIT-NEXT:    v_mov_b32_e32 v4, v7
 ; SPLIT-NEXT:    flat_store_dwordx2 v[2:3], v[8:9]
 ; SPLIT-NEXT:    flat_store_dwordx2 v[0:1], v[4:5]
 ; SPLIT-NEXT:    s_endpgm

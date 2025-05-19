@@ -406,8 +406,8 @@ define <2 x half> @chain_hi_to_lo_flat(ptr inreg %ptr) {
 ; GFX900-LABEL: chain_hi_to_lo_flat:
 ; GFX900:       ; %bb.0: ; %bb
 ; GFX900-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
-; GFX900-NEXT:    v_mov_b32_e32 v0, s16
 ; GFX900-NEXT:    v_mov_b32_e32 v1, s17
+; GFX900-NEXT:    v_mov_b32_e32 v0, s16
 ; GFX900-NEXT:    flat_load_ushort v0, v[0:1] offset:2
 ; GFX900-NEXT:    v_mov_b32_e32 v1, 0
 ; GFX900-NEXT:    v_mov_b32_e32 v2, 0
@@ -419,8 +419,8 @@ define <2 x half> @chain_hi_to_lo_flat(ptr inreg %ptr) {
 ; FLATSCR-LABEL: chain_hi_to_lo_flat:
 ; FLATSCR:       ; %bb.0: ; %bb
 ; FLATSCR-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
-; FLATSCR-NEXT:    v_mov_b32_e32 v0, s0
 ; FLATSCR-NEXT:    v_mov_b32_e32 v1, s1
+; FLATSCR-NEXT:    v_mov_b32_e32 v0, s0
 ; FLATSCR-NEXT:    flat_load_ushort v0, v[0:1] offset:2
 ; FLATSCR-NEXT:    v_mov_b32_e32 v1, 0
 ; FLATSCR-NEXT:    v_mov_b32_e32 v2, 0
@@ -462,7 +462,7 @@ define <2 x half> @chain_hi_to_lo_flat(ptr inreg %ptr) {
 ; GFX11-TRUE16-LABEL: chain_hi_to_lo_flat:
 ; GFX11-TRUE16:       ; %bb.0: ; %bb
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
-; GFX11-TRUE16-NEXT:    v_dual_mov_b32 v0, s0 :: v_dual_mov_b32 v1, s1
+; GFX11-TRUE16-NEXT:    v_dual_mov_b32 v1, s1 :: v_dual_mov_b32 v0, s0
 ; GFX11-TRUE16-NEXT:    flat_load_d16_b16 v0, v[0:1] offset:2
 ; GFX11-TRUE16-NEXT:    v_mov_b32_e32 v1, 0
 ; GFX11-TRUE16-NEXT:    v_mov_b32_e32 v2, 0
@@ -474,7 +474,7 @@ define <2 x half> @chain_hi_to_lo_flat(ptr inreg %ptr) {
 ; GFX11-FAKE16-LABEL: chain_hi_to_lo_flat:
 ; GFX11-FAKE16:       ; %bb.0: ; %bb
 ; GFX11-FAKE16-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
-; GFX11-FAKE16-NEXT:    v_dual_mov_b32 v0, s0 :: v_dual_mov_b32 v1, s1
+; GFX11-FAKE16-NEXT:    v_dual_mov_b32 v1, s1 :: v_dual_mov_b32 v0, s0
 ; GFX11-FAKE16-NEXT:    flat_load_u16 v0, v[0:1] offset:2
 ; GFX11-FAKE16-NEXT:    v_mov_b32_e32 v1, 0
 ; GFX11-FAKE16-NEXT:    v_mov_b32_e32 v2, 0

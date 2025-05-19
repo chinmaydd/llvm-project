@@ -616,8 +616,8 @@ define amdgpu_kernel void @fadd_v2_v_fneg_lo(ptr addrspace(1) %a, float %x) {
 ; PACKED-GISEL-NEXT:    v_lshlrev_b32_e32 v4, 3, v0
 ; PACKED-GISEL-NEXT:    s_waitcnt lgkmcnt(0)
 ; PACKED-GISEL-NEXT:    global_load_dwordx2 v[0:1], v4, s[0:1]
-; PACKED-GISEL-NEXT:    v_mov_b32_e32 v3, s2
 ; PACKED-GISEL-NEXT:    v_max_f32_e64 v2, -s2, -s2
+; PACKED-GISEL-NEXT:    v_mov_b32_e32 v3, s2
 ; PACKED-GISEL-NEXT:    s_waitcnt vmcnt(0)
 ; PACKED-GISEL-NEXT:    v_pk_add_f32 v[0:1], v[0:1], v[2:3]
 ; PACKED-GISEL-NEXT:    global_store_dwordx2 v4, v[0:1], s[0:1]
@@ -668,8 +668,8 @@ define amdgpu_kernel void @fadd_v2_v_fneg_hi(ptr addrspace(1) %a, float %x) {
 ; PACKED-GISEL-NEXT:    v_lshlrev_b32_e32 v4, 3, v0
 ; PACKED-GISEL-NEXT:    s_waitcnt lgkmcnt(0)
 ; PACKED-GISEL-NEXT:    global_load_dwordx2 v[0:1], v4, s[0:1]
-; PACKED-GISEL-NEXT:    v_mov_b32_e32 v2, s2
 ; PACKED-GISEL-NEXT:    v_max_f32_e64 v3, -s2, -s2
+; PACKED-GISEL-NEXT:    v_mov_b32_e32 v2, s2
 ; PACKED-GISEL-NEXT:    s_waitcnt vmcnt(0)
 ; PACKED-GISEL-NEXT:    v_pk_add_f32 v[0:1], v[0:1], v[2:3]
 ; PACKED-GISEL-NEXT:    global_store_dwordx2 v4, v[0:1], s[0:1]
@@ -2046,8 +2046,8 @@ define amdgpu_kernel void @shuffle_add_f32(ptr addrspace(1) %out, ptr addrspace(
 ; PACKED-GISEL-NEXT:    ds_read_b64 v[2:3], v2 offset:8
 ; PACKED-GISEL-NEXT:    s_load_dwordx2 s[0:1], s[4:5], 0x24
 ; PACKED-GISEL-NEXT:    s_waitcnt lgkmcnt(0)
-; PACKED-GISEL-NEXT:    v_mov_b32_e32 v4, v3
 ; PACKED-GISEL-NEXT:    v_mov_b32_e32 v5, v2
+; PACKED-GISEL-NEXT:    v_mov_b32_e32 v4, v3
 ; PACKED-GISEL-NEXT:    v_pk_add_f32 v[0:1], v[0:1], v[4:5]
 ; PACKED-GISEL-NEXT:    v_mov_b32_e32 v2, 0
 ; PACKED-GISEL-NEXT:    global_store_dwordx2 v2, v[0:1], s[0:1]
@@ -2113,8 +2113,8 @@ define amdgpu_kernel void @shuffle_neg_add_f32(ptr addrspace(1) %out, ptr addrsp
 ; PACKED-GISEL-NEXT:    v_xor_b32_e32 v2, 0x80000000, v2
 ; PACKED-GISEL-NEXT:    v_xor_b32_e32 v3, 0x80000000, v3
 ; PACKED-GISEL-NEXT:    v_pk_mul_f32 v[2:3], 1.0, v[2:3] op_sel_hi:[0,1]
-; PACKED-GISEL-NEXT:    v_mov_b32_e32 v4, v3
 ; PACKED-GISEL-NEXT:    v_mov_b32_e32 v5, v2
+; PACKED-GISEL-NEXT:    v_mov_b32_e32 v4, v3
 ; PACKED-GISEL-NEXT:    v_pk_add_f32 v[0:1], v[0:1], v[4:5]
 ; PACKED-GISEL-NEXT:    v_mov_b32_e32 v2, 0
 ; PACKED-GISEL-NEXT:    global_store_dwordx2 v2, v[0:1], s[0:1]
@@ -2136,9 +2136,9 @@ define amdgpu_kernel void @fadd_fadd_fsub_0(<2 x float> %arg) {
 ; GFX900:       ; %bb.0: ; %bb
 ; GFX900-NEXT:    s_load_dwordx2 s[0:1], s[4:5], 0x24
 ; GFX900-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX900-NEXT:    v_add_f32_e64 v0, s1, 0
-; GFX900-NEXT:    v_add_f32_e32 v1, 0, v0
+; GFX900-NEXT:    v_add_f32_e64 v1, s1, 0
 ; GFX900-NEXT:    v_mov_b32_e32 v0, s0
+; GFX900-NEXT:    v_add_f32_e32 v1, 0, v1
 ; GFX900-NEXT:    flat_store_dwordx2 v[0:1], v[0:1]
 ; GFX900-NEXT:    s_endpgm
 ;
@@ -2146,9 +2146,9 @@ define amdgpu_kernel void @fadd_fadd_fsub_0(<2 x float> %arg) {
 ; PACKED-SDAG:       ; %bb.0: ; %bb
 ; PACKED-SDAG-NEXT:    s_load_dwordx2 s[0:1], s[4:5], 0x24
 ; PACKED-SDAG-NEXT:    s_waitcnt lgkmcnt(0)
-; PACKED-SDAG-NEXT:    v_add_f32_e64 v0, s1, 0
-; PACKED-SDAG-NEXT:    v_add_f32_e32 v1, 0, v0
+; PACKED-SDAG-NEXT:    v_add_f32_e64 v1, s1, 0
 ; PACKED-SDAG-NEXT:    v_mov_b32_e32 v0, s0
+; PACKED-SDAG-NEXT:    v_add_f32_e32 v1, 0, v1
 ; PACKED-SDAG-NEXT:    flat_store_dwordx2 v[0:1], v[0:1]
 ; PACKED-SDAG-NEXT:    s_endpgm
 ;
@@ -2207,55 +2207,6 @@ define amdgpu_kernel void @fadd_fadd_fsub(<2 x float> %arg, <2 x float> %arg1, p
 ; GFX900-NEXT:    v_subrev_f32_e32 v1, s3, v3
 ; GFX900-NEXT:    global_store_dwordx2 v2, v[0:1], s[6:7]
 ; GFX900-NEXT:    s_endpgm
-;
-; PACKED-SDAG-LABEL: fadd_fadd_fsub:
-; PACKED-SDAG:       ; %bb.0: ; %bb
-; PACKED-SDAG-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x24
-; PACKED-SDAG-NEXT:    s_load_dwordx2 s[6:7], s[4:5], 0x34
-; PACKED-SDAG-NEXT:    v_mov_b32_e32 v4, 0
-; PACKED-SDAG-NEXT:    s_waitcnt lgkmcnt(0)
-; PACKED-SDAG-NEXT:    v_mov_b32_e32 v0, s3
-; PACKED-SDAG-NEXT:    v_add_f32_e32 v0, s1, v0
-; PACKED-SDAG-NEXT:    v_pk_add_f32 v[0:1], s[2:3], v[0:1] op_sel_hi:[1,0]
-; PACKED-SDAG-NEXT:    v_mov_b32_e32 v2, s0
-; PACKED-SDAG-NEXT:    v_mov_b32_e32 v3, v0
-; PACKED-SDAG-NEXT:    v_pk_add_f32 v[0:1], v[2:3], s[2:3] neg_lo:[0,1] neg_hi:[0,1]
-; PACKED-SDAG-NEXT:    global_store_dwordx2 v4, v[0:1], s[6:7]
-; PACKED-SDAG-NEXT:    s_endpgm
-;
-; GFX90A-GISEL-LABEL: fadd_fadd_fsub:
-; GFX90A-GISEL:       ; %bb.0: ; %bb
-; GFX90A-GISEL-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x24
-; GFX90A-GISEL-NEXT:    s_load_dwordx2 s[6:7], s[4:5], 0x34
-; GFX90A-GISEL-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX90A-GISEL-NEXT:    v_pk_mov_b32 v[0:1], s[2:3], s[2:3] op_sel:[0,1]
-; GFX90A-GISEL-NEXT:    v_mov_b32_e32 v2, s2
-; GFX90A-GISEL-NEXT:    v_pk_add_f32 v[0:1], s[0:1], v[0:1]
-; GFX90A-GISEL-NEXT:    v_sub_f32_e32 v0, s0, v2
-; GFX90A-GISEL-NEXT:    v_mov_b32_e32 v2, v1
-; GFX90A-GISEL-NEXT:    v_pk_add_f32 v[2:3], s[2:3], v[2:3]
-; GFX90A-GISEL-NEXT:    v_subrev_f32_e32 v1, s3, v2
-; GFX90A-GISEL-NEXT:    v_mov_b32_e32 v2, 0
-; GFX90A-GISEL-NEXT:    global_store_dwordx2 v2, v[0:1], s[6:7]
-; GFX90A-GISEL-NEXT:    s_endpgm
-;
-; GFX942-GISEL-LABEL: fadd_fadd_fsub:
-; GFX942-GISEL:       ; %bb.0: ; %bb
-; GFX942-GISEL-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x24
-; GFX942-GISEL-NEXT:    s_load_dwordx2 s[6:7], s[4:5], 0x34
-; GFX942-GISEL-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX942-GISEL-NEXT:    v_mov_b64_e32 v[0:1], s[2:3]
-; GFX942-GISEL-NEXT:    v_mov_b32_e32 v2, s2
-; GFX942-GISEL-NEXT:    v_pk_add_f32 v[0:1], s[0:1], v[0:1]
-; GFX942-GISEL-NEXT:    s_nop 0
-; GFX942-GISEL-NEXT:    v_sub_f32_e32 v0, s0, v2
-; GFX942-GISEL-NEXT:    v_mov_b32_e32 v2, v1
-; GFX942-GISEL-NEXT:    v_pk_add_f32 v[2:3], s[2:3], v[2:3]
-; GFX942-GISEL-NEXT:    s_nop 0
-; GFX942-GISEL-NEXT:    v_subrev_f32_e32 v1, s3, v2
-; GFX942-GISEL-NEXT:    v_mov_b32_e32 v2, 0
-; GFX942-GISEL-NEXT:    global_store_dwordx2 v2, v[0:1], s[6:7]
-; GFX942-GISEL-NEXT:    s_endpgm
 bb:
   %i12 = fadd <2 x float> %arg, %arg1
   %shift8 = shufflevector <2 x float> %i12, <2 x float> poison, <2 x i32> <i32 1, i32 poison>
@@ -2372,8 +2323,8 @@ define amdgpu_kernel void @fneg_v2f32_scalar(ptr addrspace(1) %a, <2 x float> %x
 ; GFX900-NEXT:    s_waitcnt lgkmcnt(0)
 ; GFX900-NEXT:    s_xor_b32 s3, s3, 0x80000000
 ; GFX900-NEXT:    s_xor_b32 s2, s2, 0x80000000
-; GFX900-NEXT:    v_mov_b32_e32 v0, s2
 ; GFX900-NEXT:    v_mov_b32_e32 v1, s3
+; GFX900-NEXT:    v_mov_b32_e32 v0, s2
 ; GFX900-NEXT:    global_store_dwordx2 v2, v[0:1], s[0:1]
 ; GFX900-NEXT:    s_endpgm
 ;
@@ -2384,8 +2335,8 @@ define amdgpu_kernel void @fneg_v2f32_scalar(ptr addrspace(1) %a, <2 x float> %x
 ; PACKED-SDAG-NEXT:    s_waitcnt lgkmcnt(0)
 ; PACKED-SDAG-NEXT:    s_xor_b32 s3, s3, 0x80000000
 ; PACKED-SDAG-NEXT:    s_xor_b32 s2, s2, 0x80000000
-; PACKED-SDAG-NEXT:    v_mov_b32_e32 v0, s2
 ; PACKED-SDAG-NEXT:    v_mov_b32_e32 v1, s3
+; PACKED-SDAG-NEXT:    v_mov_b32_e32 v0, s2
 ; PACKED-SDAG-NEXT:    global_store_dwordx2 v2, v[0:1], s[0:1]
 ; PACKED-SDAG-NEXT:    s_endpgm
 ;

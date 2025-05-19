@@ -285,10 +285,9 @@ main_body:
 define amdgpu_ps <4 x float> @load_2dmsaa_a16(<8 x i32> inreg %rsrc, i16 %s, i16 %t, i16 %fragid) {
 ; GFX11-TRUE16-LABEL: load_2dmsaa_a16:
 ; GFX11-TRUE16:       ; %bb.0: ; %main_body
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v3.l, v2.l ; encoding: [0x02,0x39,0x06,0x7e]
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.l, v0.l ; encoding: [0x00,0x39,0x04,0x7e]
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.h, v1.l ; encoding: [0x01,0x39,0x04,0x7f]
-; GFX11-TRUE16-NEXT:    image_msaa_load v[0:3], v[2:3], s[0:7] dmask:0x1 dim:SQ_RSRC_IMG_2D_MSAA unorm a16 ; encoding: [0x98,0x01,0x61,0xf0,0x02,0x00,0x00,0x00]
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.h, v1.l ; encoding: [0x01,0x39,0x02,0x7f]
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.l, v0.l ; encoding: [0x00,0x39,0x02,0x7e]
+; GFX11-TRUE16-NEXT:    image_msaa_load v[0:3], v[1:2], s[0:7] dmask:0x1 dim:SQ_RSRC_IMG_2D_MSAA unorm a16 ; encoding: [0x98,0x01,0x61,0xf0,0x01,0x00,0x00,0x00]
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0) ; encoding: [0xf7,0x03,0x89,0xbf]
 ; GFX11-TRUE16-NEXT:    ; return to shader part epilog
 ;
@@ -301,8 +300,9 @@ define amdgpu_ps <4 x float> @load_2dmsaa_a16(<8 x i32> inreg %rsrc, i16 %s, i16
 ;
 ; GFX12-TRUE16-LABEL: load_2dmsaa_a16:
 ; GFX12-TRUE16:       ; %bb.0: ; %main_body
-; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v0.h, v1.l ; encoding: [0x01,0x39,0x00,0x7f]
-; GFX12-TRUE16-NEXT:    image_msaa_load v[0:3], [v0, v2], s[0:7] dmask:0x1 dim:SQ_RSRC_IMG_2D_MSAA unorm a16 ; encoding: [0x46,0x20,0x46,0xe4,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x00]
+; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v1.h, v1.l ; encoding: [0x01,0x39,0x02,0x7f]
+; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v1.l, v0.l ; encoding: [0x00,0x39,0x02,0x7e]
+; GFX12-TRUE16-NEXT:    image_msaa_load v[0:3], [v1, v2], s[0:7] dmask:0x1 dim:SQ_RSRC_IMG_2D_MSAA unorm a16 ; encoding: [0x46,0x20,0x46,0xe4,0x00,0x00,0x00,0x00,0x01,0x02,0x00,0x00]
 ; GFX12-TRUE16-NEXT:    s_wait_samplecnt 0x0 ; encoding: [0x00,0x00,0xc2,0xbf]
 ; GFX12-TRUE16-NEXT:    ; return to shader part epilog
 ;
@@ -320,11 +320,11 @@ main_body:
 define amdgpu_ps <4 x float> @load_2darraymsaa_a16(<8 x i32> inreg %rsrc, i16 %s, i16 %t, i16 %slice, i16 %fragid) {
 ; GFX11-TRUE16-LABEL: load_2darraymsaa_a16:
 ; GFX11-TRUE16:       ; %bb.0: ; %main_body
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v4.l, v2.l ; encoding: [0x02,0x39,0x08,0x7e]
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v4.h, v3.l ; encoding: [0x03,0x39,0x08,0x7f]
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v3.l, v0.l ; encoding: [0x00,0x39,0x06,0x7e]
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v3.h, v1.l ; encoding: [0x01,0x39,0x06,0x7f]
-; GFX11-TRUE16-NEXT:    image_msaa_load v[0:3], v[3:4], s[0:7] dmask:0x4 dim:SQ_RSRC_IMG_2D_MSAA_ARRAY unorm a16 ; encoding: [0x9c,0x04,0x61,0xf0,0x03,0x00,0x00,0x00]
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v3.h, v3.l ; encoding: [0x03,0x39,0x06,0x7f]
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v3.l, v2.l ; encoding: [0x02,0x39,0x06,0x7e]
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.h, v1.l ; encoding: [0x01,0x39,0x04,0x7f]
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.l, v0.l ; encoding: [0x00,0x39,0x04,0x7e]
+; GFX11-TRUE16-NEXT:    image_msaa_load v[0:3], v[2:3], s[0:7] dmask:0x4 dim:SQ_RSRC_IMG_2D_MSAA_ARRAY unorm a16 ; encoding: [0x9c,0x04,0x61,0xf0,0x02,0x00,0x00,0x00]
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0) ; encoding: [0xf7,0x03,0x89,0xbf]
 ; GFX11-TRUE16-NEXT:    ; return to shader part epilog
 ;
@@ -338,9 +338,11 @@ define amdgpu_ps <4 x float> @load_2darraymsaa_a16(<8 x i32> inreg %rsrc, i16 %s
 ;
 ; GFX12-TRUE16-LABEL: load_2darraymsaa_a16:
 ; GFX12-TRUE16:       ; %bb.0: ; %main_body
-; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v2.h, v3.l ; encoding: [0x03,0x39,0x04,0x7f]
-; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v0.h, v1.l ; encoding: [0x01,0x39,0x00,0x7f]
-; GFX12-TRUE16-NEXT:    image_msaa_load v[0:3], [v0, v2], s[0:7] dmask:0x4 dim:SQ_RSRC_IMG_2D_MSAA_ARRAY unorm a16 ; encoding: [0x47,0x20,0x06,0xe5,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x00]
+; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v3.h, v3.l ; encoding: [0x03,0x39,0x06,0x7f]
+; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v3.l, v2.l ; encoding: [0x02,0x39,0x06,0x7e]
+; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v1.h, v1.l ; encoding: [0x01,0x39,0x02,0x7f]
+; GFX12-TRUE16-NEXT:    v_mov_b16_e32 v1.l, v0.l ; encoding: [0x00,0x39,0x02,0x7e]
+; GFX12-TRUE16-NEXT:    image_msaa_load v[0:3], [v1, v3], s[0:7] dmask:0x4 dim:SQ_RSRC_IMG_2D_MSAA_ARRAY unorm a16 ; encoding: [0x47,0x20,0x06,0xe5,0x00,0x00,0x00,0x00,0x01,0x03,0x00,0x00]
 ; GFX12-TRUE16-NEXT:    s_wait_samplecnt 0x0 ; encoding: [0x00,0x00,0xc2,0xbf]
 ; GFX12-TRUE16-NEXT:    ; return to shader part epilog
 ;

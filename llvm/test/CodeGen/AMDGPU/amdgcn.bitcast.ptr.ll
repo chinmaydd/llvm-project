@@ -26,8 +26,8 @@ define amdgpu_kernel void @bitcast_i8ptr_v16i8ptr(ptr addrspace(1) %out, ptr add
 ; VI-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x24
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
 ; VI-NEXT:    s_load_dwordx4 s[4:7], s[2:3], 0x0
-; VI-NEXT:    v_mov_b32_e32 v4, s0
 ; VI-NEXT:    v_mov_b32_e32 v5, s1
+; VI-NEXT:    v_mov_b32_e32 v4, s0
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
 ; VI-NEXT:    v_mov_b32_e32 v0, s4
 ; VI-NEXT:    v_mov_b32_e32 v1, s5

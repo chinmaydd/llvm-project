@@ -224,9 +224,10 @@ define <2 x half> @v_test_canonicalize_build_vector_v2f16(half %lo, half %hi) #1
 ; GFX11-TRUE16-LABEL: v_test_canonicalize_build_vector_v2f16:
 ; GFX11-TRUE16:       ; %bb.0:
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v0.h, v1.l
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.h, v1.l
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.l, v0.l
 ; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_1)
-; GFX11-TRUE16-NEXT:    v_pk_max_f16 v0, v0, v0
+; GFX11-TRUE16-NEXT:    v_pk_max_f16 v0, v1, v1
 ; GFX11-TRUE16-NEXT:    s_setpc_b64 s[30:31]
 ;
 ; GFX11-FAKE16-LABEL: v_test_canonicalize_build_vector_v2f16:
@@ -1393,13 +1394,13 @@ define amdgpu_kernel void @v_test_canonicalize_var_v2f16(ptr addrspace(1) %out) 
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
 ; VI-NEXT:    v_add_u32_e32 v0, vcc, s0, v0
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
-; VI-NEXT:    flat_load_dword v0, v[0:1]
-; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_max_f16_sdwa v1, v0, v0 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
-; VI-NEXT:    v_max_f16_e32 v0, v0, v0
-; VI-NEXT:    v_or_b32_e32 v2, v0, v1
+; VI-NEXT:    flat_load_dword v2, v[0:1]
 ; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    s_waitcnt vmcnt(0)
+; VI-NEXT:    v_max_f16_sdwa v3, v2, v2 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
+; VI-NEXT:    v_max_f16_e32 v2, v2, v2
+; VI-NEXT:    v_or_b32_e32 v2, v2, v3
 ; VI-NEXT:    flat_store_dword v[0:1], v2
 ; VI-NEXT:    s_endpgm
 ;
@@ -1467,13 +1468,13 @@ define amdgpu_kernel void @v_test_canonicalize_fabs_var_v2f16(ptr addrspace(1) %
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
 ; VI-NEXT:    v_add_u32_e32 v0, vcc, s0, v0
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
-; VI-NEXT:    flat_load_dword v0, v[0:1]
-; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_max_f16_sdwa v1, |v0|, |v0| dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
-; VI-NEXT:    v_max_f16_e64 v0, |v0|, |v0|
-; VI-NEXT:    v_or_b32_e32 v2, v0, v1
+; VI-NEXT:    flat_load_dword v2, v[0:1]
 ; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    s_waitcnt vmcnt(0)
+; VI-NEXT:    v_max_f16_sdwa v3, |v2|, |v2| dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
+; VI-NEXT:    v_max_f16_e64 v2, |v2|, |v2|
+; VI-NEXT:    v_or_b32_e32 v2, v2, v3
 ; VI-NEXT:    flat_store_dword v[0:1], v2
 ; VI-NEXT:    s_endpgm
 ;
@@ -1544,13 +1545,13 @@ define amdgpu_kernel void @v_test_canonicalize_fneg_fabs_var_v2f16(ptr addrspace
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
 ; VI-NEXT:    v_add_u32_e32 v0, vcc, s0, v0
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
-; VI-NEXT:    flat_load_dword v0, v[0:1]
-; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_max_f16_sdwa v1, -|v0|, -|v0| dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
-; VI-NEXT:    v_max_f16_e64 v0, -|v0|, -|v0|
-; VI-NEXT:    v_or_b32_e32 v2, v0, v1
+; VI-NEXT:    flat_load_dword v2, v[0:1]
 ; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    s_waitcnt vmcnt(0)
+; VI-NEXT:    v_max_f16_sdwa v3, -|v2|, -|v2| dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
+; VI-NEXT:    v_max_f16_e64 v2, -|v2|, -|v2|
+; VI-NEXT:    v_or_b32_e32 v2, v2, v3
 ; VI-NEXT:    flat_store_dword v[0:1], v2
 ; VI-NEXT:    s_endpgm
 ;
@@ -1623,13 +1624,13 @@ define amdgpu_kernel void @v_test_canonicalize_fneg_var_v2f16(ptr addrspace(1) %
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
 ; VI-NEXT:    v_add_u32_e32 v0, vcc, s0, v0
 ; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v1, vcc
-; VI-NEXT:    flat_load_dword v0, v[0:1]
-; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_max_f16_sdwa v1, -v0, -v0 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
-; VI-NEXT:    v_max_f16_e64 v0, -v0, -v0
-; VI-NEXT:    v_or_b32_e32 v2, v0, v1
+; VI-NEXT:    flat_load_dword v2, v[0:1]
 ; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s1
+; VI-NEXT:    s_waitcnt vmcnt(0)
+; VI-NEXT:    v_max_f16_sdwa v3, -v2, -v2 dst_sel:WORD_1 dst_unused:UNUSED_PAD src0_sel:WORD_1 src1_sel:WORD_1
+; VI-NEXT:    v_max_f16_e64 v2, -v2, -v2
+; VI-NEXT:    v_or_b32_e32 v2, v2, v3
 ; VI-NEXT:    flat_store_dword v[0:1], v2
 ; VI-NEXT:    s_endpgm
 ;
@@ -2961,10 +2962,11 @@ define <4 x half> @v_test_canonicalize_reg_reg_undef_undef_v4f16(half %val0, hal
 ; GFX11-TRUE16-LABEL: v_test_canonicalize_reg_reg_undef_undef_v4f16:
 ; GFX11-TRUE16:       ; %bb.0:
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v0.h, v1.l
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.h, v1.l
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.l, v0.l
+; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_1)
+; GFX11-TRUE16-NEXT:    v_pk_max_f16 v0, v1, v1
 ; GFX11-TRUE16-NEXT:    v_mov_b32_e32 v1, 0x7e007e00
-; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_2)
-; GFX11-TRUE16-NEXT:    v_pk_max_f16 v0, v0, v0
 ; GFX11-TRUE16-NEXT:    s_setpc_b64 s[30:31]
 ;
 ; GFX11-FAKE16-LABEL: v_test_canonicalize_reg_reg_undef_undef_v4f16:
@@ -3017,11 +3019,12 @@ define <4 x half> @v_test_canonicalize_reg_undef_reg_reg_v4f16(half %val0, half 
 ; GFX11-TRUE16-LABEL: v_test_canonicalize_reg_undef_reg_reg_v4f16:
 ; GFX11-TRUE16:       ; %bb.0:
 ; GFX11-TRUE16-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.h, v2.l
 ; GFX11-TRUE16-NEXT:    v_max_f16_e32 v0.l, v0.l, v0.l
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v1.h, v2.l
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.l, v1.l
 ; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_2)
 ; GFX11-TRUE16-NEXT:    v_pack_b32_f16 v0, v0.l, 0
-; GFX11-TRUE16-NEXT:    v_pk_max_f16 v1, v1, v1
+; GFX11-TRUE16-NEXT:    v_pk_max_f16 v1, v2, v2
 ; GFX11-TRUE16-NEXT:    s_setpc_b64 s[30:31]
 ;
 ; GFX11-FAKE16-LABEL: v_test_canonicalize_reg_undef_reg_reg_v4f16:

@@ -290,8 +290,8 @@ define amdgpu_kernel void @trap_with_use_after(ptr addrspace(1) %arg0, ptr addrs
 ; HSA-TRAP-GFX803-NEXT:    s_mov_b32 flat_scratch_lo, s13
 ; HSA-TRAP-GFX803-NEXT:    s_lshr_b32 flat_scratch_hi, s12, 8
 ; HSA-TRAP-GFX803-NEXT:    s_waitcnt lgkmcnt(0)
-; HSA-TRAP-GFX803-NEXT:    v_mov_b32_e32 v0, s4
 ; HSA-TRAP-GFX803-NEXT:    v_mov_b32_e32 v1, s5
+; HSA-TRAP-GFX803-NEXT:    v_mov_b32_e32 v0, s4
 ; HSA-TRAP-GFX803-NEXT:    flat_load_dword v2, v[0:1] glc
 ; HSA-TRAP-GFX803-NEXT:    s_waitcnt vmcnt(0)
 ; HSA-TRAP-GFX803-NEXT:    v_mov_b32_e32 v0, s6

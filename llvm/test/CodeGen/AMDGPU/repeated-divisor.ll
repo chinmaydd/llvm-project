@@ -957,14 +957,13 @@ define <6 x half> @v_repeat_divisor_v3f16_x2(<3 x half> %x, <3 x half> %y, <3 x 
 ; GFX11-TRUE16-NEXT:    v_pack_b32_f16 v4, v4.l, v4.h
 ; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_2) | instskip(NEXT) | instid1(VALU_DEP_2)
 ; GFX11-TRUE16-NEXT:    v_pk_mul_f16 v1, v1, v5
-; GFX11-TRUE16-NEXT:    v_pk_mul_f16 v2, v2, v4
-; GFX11-TRUE16-NEXT:    v_pk_mul_f16 v3, v3, v5
+; GFX11-TRUE16-NEXT:    v_pk_mul_f16 v6, v2, v4
+; GFX11-TRUE16-NEXT:    v_pk_mul_f16 v2, v3, v5
 ; GFX11-TRUE16-NEXT:    v_pk_mul_f16 v0, v0, v4
-; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_3) | instskip(NEXT) | instid1(VALU_DEP_4)
-; GFX11-TRUE16-NEXT:    v_pack_b32_f16 v1, v1.l, v2.l
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.l, v2.h
-; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_4)
-; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.h, v3.l
+; GFX11-TRUE16-NEXT:    s_delay_alu instid0(VALU_DEP_3) | instskip(NEXT) | instid1(VALU_DEP_3)
+; GFX11-TRUE16-NEXT:    v_pack_b32_f16 v1, v1.l, v6.l
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.h, v2.l
+; GFX11-TRUE16-NEXT:    v_mov_b16_e32 v2.l, v6.h
 ; GFX11-TRUE16-NEXT:    s_setpc_b64 s[30:31]
 ;
 ; GFX11-FAKE16-LABEL: v_repeat_divisor_v3f16_x2:

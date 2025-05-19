@@ -275,8 +275,8 @@ define amdgpu_kernel void @fptrunc(
 ; GCN-NEXT:    s_mov_b32 s10, s6
 ; GCN-NEXT:    s_mov_b32 s11, s7
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
-; GCN-NEXT:    s_mov_b32 s8, s2
 ; GCN-NEXT:    s_mov_b32 s9, s3
+; GCN-NEXT:    s_mov_b32 s8, s2
 ; GCN-NEXT:    s_mov_b32 s4, s0
 ; GCN-NEXT:    buffer_load_dwordx2 v[0:1], off, s[8:11], 0
 ; GCN-NEXT:    s_mov_b32 s5, s1
@@ -309,8 +309,8 @@ define amdgpu_kernel void @fptrunc(
 ; GFX11-GCN-FAKE16-NEXT:    s_mov_b32 s10, s6
 ; GFX11-GCN-FAKE16-NEXT:    s_mov_b32 s11, s7
 ; GFX11-GCN-FAKE16-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX11-GCN-FAKE16-NEXT:    s_mov_b32 s8, s2
 ; GFX11-GCN-FAKE16-NEXT:    s_mov_b32 s9, s3
+; GFX11-GCN-FAKE16-NEXT:    s_mov_b32 s8, s2
 ; GFX11-GCN-FAKE16-NEXT:    s_mov_b32 s4, s0
 ; GFX11-GCN-FAKE16-NEXT:    buffer_load_b64 v[0:1], off, s[8:11], 0
 ; GFX11-GCN-FAKE16-NEXT:    s_mov_b32 s5, s1
@@ -345,8 +345,8 @@ define amdgpu_kernel void @fptrunc(
 ; GFX11-GCN-REAL16-NEXT:    s_mov_b32 s10, s6
 ; GFX11-GCN-REAL16-NEXT:    s_mov_b32 s11, s7
 ; GFX11-GCN-REAL16-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX11-GCN-REAL16-NEXT:    s_mov_b32 s8, s2
 ; GFX11-GCN-REAL16-NEXT:    s_mov_b32 s9, s3
+; GFX11-GCN-REAL16-NEXT:    s_mov_b32 s8, s2
 ; GFX11-GCN-REAL16-NEXT:    s_mov_b32 s4, s0
 ; GFX11-GCN-REAL16-NEXT:    buffer_load_b64 v[1:2], off, s[8:11], 0
 ; GFX11-GCN-REAL16-NEXT:    s_mov_b32 s5, s1

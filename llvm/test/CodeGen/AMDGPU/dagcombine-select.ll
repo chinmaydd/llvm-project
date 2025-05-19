@@ -68,10 +68,10 @@ define amdgpu_kernel void @select_and_v4(ptr addrspace(1) %p, i32 %x, <4 x i32> 
 ; GCN-NEXT:    s_cselect_b32 s2, s2, 0
 ; GCN-NEXT:    s_cselect_b32 s1, s1, 0
 ; GCN-NEXT:    s_cselect_b32 s0, s0, 0
-; GCN-NEXT:    v_mov_b32_e32 v0, s0
 ; GCN-NEXT:    v_mov_b32_e32 v1, s1
 ; GCN-NEXT:    v_mov_b32_e32 v2, s2
 ; GCN-NEXT:    v_mov_b32_e32 v3, s3
+; GCN-NEXT:    v_mov_b32_e32 v0, s0
 ; GCN-NEXT:    global_store_dwordx4 v4, v[0:3], s[6:7]
 ; GCN-NEXT:    s_endpgm
   %c = icmp slt i32 %x, 11
@@ -148,10 +148,10 @@ define amdgpu_kernel void @select_or_v4(ptr addrspace(1) %p, i32 %x, <4 x i32> %
 ; GCN-NEXT:    s_cselect_b32 s2, s2, -1
 ; GCN-NEXT:    s_cselect_b32 s1, s1, -1
 ; GCN-NEXT:    s_cselect_b32 s0, s0, -1
-; GCN-NEXT:    v_mov_b32_e32 v0, s0
 ; GCN-NEXT:    v_mov_b32_e32 v1, s1
 ; GCN-NEXT:    v_mov_b32_e32 v2, s2
 ; GCN-NEXT:    v_mov_b32_e32 v3, s3
+; GCN-NEXT:    v_mov_b32_e32 v0, s0
 ; GCN-NEXT:    global_store_dwordx4 v4, v[0:3], s[6:7]
 ; GCN-NEXT:    s_endpgm
   %c = icmp slt i32 %x, 11
@@ -247,10 +247,10 @@ define amdgpu_kernel void @sel_constants_sub_constant_sel_constants_v4i32(ptr ad
 ; GCN-NEXT:    s_cselect_b32 s3, 6, 10
 ; GCN-NEXT:    s_cselect_b32 s4, 5, 6
 ; GCN-NEXT:    s_cselect_b32 s5, 9, 2
-; GCN-NEXT:    v_mov_b32_e32 v0, s5
 ; GCN-NEXT:    v_mov_b32_e32 v1, s4
 ; GCN-NEXT:    v_mov_b32_e32 v2, s3
 ; GCN-NEXT:    v_mov_b32_e32 v3, s2
+; GCN-NEXT:    v_mov_b32_e32 v0, s5
 ; GCN-NEXT:    global_store_dwordx4 v4, v[0:3], s[0:1]
 ; GCN-NEXT:    s_endpgm
   %sel = select i1 %cond, <4 x i32> <i32 -4, i32 2, i32 3, i32 4>, <4 x i32> <i32 3, i32 1, i32 -1, i32 -3>
@@ -473,10 +473,10 @@ define amdgpu_kernel void @fsub_constant_sel_constants_v4f32(ptr addrspace(1) %p
 ; GCN-NEXT:    s_cselect_b32 s3, 0x41100000, 4.0
 ; GCN-NEXT:    s_cselect_b32 s4, 0x40a00000, 2.0
 ; GCN-NEXT:    s_cselect_b32 s5, 1.0, 0
-; GCN-NEXT:    v_mov_b32_e32 v0, s5
 ; GCN-NEXT:    v_mov_b32_e32 v1, s4
 ; GCN-NEXT:    v_mov_b32_e32 v2, s3
 ; GCN-NEXT:    v_mov_b32_e32 v3, s2
+; GCN-NEXT:    v_mov_b32_e32 v0, s5
 ; GCN-NEXT:    global_store_dwordx4 v4, v[0:3], s[0:1]
 ; GCN-NEXT:    s_endpgm
   %sel = select i1 %cond, <4 x float> <float -2.0, float -3.0, float -4.0, float -5.0>, <4 x float> <float -1.0, float 0.0, float 1.0, float 2.0>

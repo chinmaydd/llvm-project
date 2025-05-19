@@ -21,8 +21,8 @@ define amdgpu_ps void @global_load_lds_dword_saddr(ptr addrspace(1) inreg nocapt
 ; GFX942-NEXT:    s_waitcnt lgkmcnt(0)
 ; GFX942-NEXT:    s_mul_i32 s3, s3, 10
 ; GFX942-NEXT:    s_mul_i32 s2, s2, 10
-; GFX942-NEXT:    v_mov_b32_e32 v0, s2
 ; GFX942-NEXT:    v_mov_b32_e32 v1, s3
+; GFX942-NEXT:    v_mov_b32_e32 v0, s2
 ; GFX942-NEXT:    global_store_dwordx2 v2, v[0:1], s[0:1]
 ; GFX942-NEXT:    s_endpgm
 ;

@@ -31,7 +31,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_bf16_vv(<32 x bfloat> %src, i32
 define amdgpu_ps void @test_scalef32_sr_pk32_bf6_bf16_sl(<32 x bfloat> inreg %src, i32 inreg %sr, ptr addrspace(1) %out) {
 ; GFX950-SDAG-LABEL: test_scalef32_sr_pk32_bf6_bf16_sl:
 ; GFX950-SDAG:       ; %bb.0:
-; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v5, s3
@@ -47,6 +46,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_bf16_sl(<32 x bfloat> inreg %sr
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v15, s13
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v16, s14
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v17, s15
+; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v24, 0x42c80000
 ; GFX950-SDAG-NEXT:    v_cvt_scalef32_sr_pk32_bf6_bf16 v[18:23], v[2:17], s16, v24
 ; GFX950-SDAG-NEXT:    global_store_dwordx2 v[0:1], v[22:23], off offset:16
@@ -55,7 +55,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_bf16_sl(<32 x bfloat> inreg %sr
 ;
 ; GFX950-GISEL-LABEL: test_scalef32_sr_pk32_bf6_bf16_sl:
 ; GFX950-GISEL:       ; %bb.0:
-; GFX950-GISEL-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v5, s3
@@ -71,6 +70,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_bf16_sl(<32 x bfloat> inreg %sr
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v15, s13
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v16, s14
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v17, s15
+; GFX950-GISEL-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v24, 0x42c80000
 ; GFX950-GISEL-NEXT:    v_cvt_scalef32_sr_pk32_bf6_bf16 v[18:23], v[2:17], s16, v24
 ; GFX950-GISEL-NEXT:    global_store_dwordx2 v[0:1], v[22:23], off offset:16
@@ -103,7 +103,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_f16_vv(<32 x half> %src, i32 %s
 define amdgpu_ps void @test_scalef32_sr_pk32_bf6_f16_sl(<32 x half> inreg %src, i32 inreg %sr, ptr addrspace(1) %out) {
 ; GFX950-SDAG-LABEL: test_scalef32_sr_pk32_bf6_f16_sl:
 ; GFX950-SDAG:       ; %bb.0:
-; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v5, s3
@@ -119,6 +118,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_f16_sl(<32 x half> inreg %src, 
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v15, s13
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v16, s14
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v17, s15
+; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v24, 0x42c80000
 ; GFX950-SDAG-NEXT:    v_cvt_scalef32_sr_pk32_bf6_f16 v[18:23], v[2:17], s16, v24
 ; GFX950-SDAG-NEXT:    global_store_dwordx2 v[0:1], v[22:23], off offset:16
@@ -167,7 +167,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_bf16_vv(<32 x bfloat> %src, i32
 define amdgpu_ps void @test_scalef32_sr_pk32_fp6_bf16_sl(<32 x bfloat> inreg %src, i32 inreg %sr, ptr addrspace(1) %out) {
 ; GFX950-SDAG-LABEL: test_scalef32_sr_pk32_fp6_bf16_sl:
 ; GFX950-SDAG:       ; %bb.0:
-; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v5, s3
@@ -183,6 +182,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_bf16_sl(<32 x bfloat> inreg %sr
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v15, s13
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v16, s14
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v17, s15
+; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v24, 0x42c80000
 ; GFX950-SDAG-NEXT:    v_cvt_scalef32_sr_pk32_fp6_bf16 v[18:23], v[2:17], s16, v24
 ; GFX950-SDAG-NEXT:    global_store_dwordx2 v[0:1], v[22:23], off offset:16
@@ -191,7 +191,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_bf16_sl(<32 x bfloat> inreg %sr
 ;
 ; GFX950-GISEL-LABEL: test_scalef32_sr_pk32_fp6_bf16_sl:
 ; GFX950-GISEL:       ; %bb.0:
-; GFX950-GISEL-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v5, s3
@@ -207,6 +206,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_bf16_sl(<32 x bfloat> inreg %sr
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v15, s13
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v16, s14
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v17, s15
+; GFX950-GISEL-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-GISEL-NEXT:    v_mov_b32_e32 v24, 0x42c80000
 ; GFX950-GISEL-NEXT:    v_cvt_scalef32_sr_pk32_fp6_bf16 v[18:23], v[2:17], s16, v24
 ; GFX950-GISEL-NEXT:    global_store_dwordx2 v[0:1], v[22:23], off offset:16
@@ -239,7 +239,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_f16_vv(<32 x half> %src, i32 %s
 define amdgpu_ps void @test_scalef32_sr_pk32_fp6_f16_sl(<32 x half> inreg %src, i32 inreg %sr, ptr addrspace(1) %out) {
 ; GFX950-SDAG-LABEL: test_scalef32_sr_pk32_fp6_f16_sl:
 ; GFX950-SDAG:       ; %bb.0:
-; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v5, s3
@@ -255,6 +254,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_f16_sl(<32 x half> inreg %src, 
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v15, s13
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v16, s14
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v17, s15
+; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v24, 0x42c80000
 ; GFX950-SDAG-NEXT:    v_cvt_scalef32_sr_pk32_fp6_f16 v[18:23], v[2:17], s16, v24
 ; GFX950-SDAG-NEXT:    global_store_dwordx2 v[0:1], v[22:23], off offset:16
@@ -303,7 +303,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_f32_vv(<32 x float> %src, i32 %
 define amdgpu_ps void @test_scalef32_sr_pk32_bf6_f32_sl(<32 x float> inreg %src, i32 inreg %sr, ptr addrspace(1) %out) {
 ; GFX950-SDAG-LABEL: test_scalef32_sr_pk32_bf6_f32_sl:
 ; GFX950-SDAG:       ; %bb.0:
-; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v5, s3
@@ -335,6 +334,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_bf6_f32_sl(<32 x float> inreg %src,
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v31, s29
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v32, s30
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v33, s31
+; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v40, 0x42c80000
 ; GFX950-SDAG-NEXT:    v_cvt_scalef32_sr_pk32_bf6_f32 v[34:39], v[2:33], s32, v40
 ; GFX950-SDAG-NEXT:    global_store_dwordx2 v[0:1], v[38:39], off offset:16
@@ -391,7 +391,6 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_f32_vv(<32 x float> %src, i32 %
 define amdgpu_ps void @test_scalef32_sr_pk32_fp6_f32_sl(<32 x float> inreg %src, i32 inreg %sr, ptr addrspace(1) %out) {
 ; GFX950-SDAG-LABEL: test_scalef32_sr_pk32_fp6_f32_sl:
 ; GFX950-SDAG:       ; %bb.0:
-; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v4, s2
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v5, s3
@@ -423,6 +422,7 @@ define amdgpu_ps void @test_scalef32_sr_pk32_fp6_f32_sl(<32 x float> inreg %src,
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v31, s29
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v32, s30
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v33, s31
+; GFX950-SDAG-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX950-SDAG-NEXT:    v_mov_b32_e32 v40, 0x42c80000
 ; GFX950-SDAG-NEXT:    v_cvt_scalef32_sr_pk32_fp6_f32 v[34:39], v[2:33], s32, v40
 ; GFX950-SDAG-NEXT:    global_store_dwordx2 v[0:1], v[38:39], off offset:16

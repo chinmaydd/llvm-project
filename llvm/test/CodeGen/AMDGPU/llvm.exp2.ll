@@ -179,21 +179,21 @@ define amdgpu_kernel void @s_exp2_v2f32(ptr addrspace(1) %out, <2 x float> %in) 
 ; SI-SDAG-NEXT:    s_mov_b32 s7, 0xf000
 ; SI-SDAG-NEXT:    s_mov_b32 s6, -1
 ; SI-SDAG-NEXT:    s_waitcnt lgkmcnt(0)
-; SI-SDAG-NEXT:    v_cmp_lt_f32_e32 vcc, s3, v0
-; SI-SDAG-NEXT:    v_cndmask_b32_e32 v2, 0, v1, vcc
 ; SI-SDAG-NEXT:    s_mov_b32 s4, s0
 ; SI-SDAG-NEXT:    s_mov_b32 s5, s1
-; SI-SDAG-NEXT:    s_and_b64 s[0:1], vcc, exec
+; SI-SDAG-NEXT:    v_cmp_lt_f32_e32 vcc, s3, v0
+; SI-SDAG-NEXT:    v_cmp_lt_f32_e64 s[0:1], s2, v0
+; SI-SDAG-NEXT:    v_cndmask_b32_e32 v2, 0, v1, vcc
+; SI-SDAG-NEXT:    v_cndmask_b32_e64 v0, 0, v1, s[0:1]
 ; SI-SDAG-NEXT:    v_add_f32_e32 v2, s3, v2
-; SI-SDAG-NEXT:    v_cmp_lt_f32_e32 vcc, s2, v0
-; SI-SDAG-NEXT:    v_exp_f32_e32 v2, v2
-; SI-SDAG-NEXT:    v_cndmask_b32_e32 v0, 0, v1, vcc
 ; SI-SDAG-NEXT:    v_add_f32_e32 v0, s2, v0
+; SI-SDAG-NEXT:    v_exp_f32_e32 v1, v2
 ; SI-SDAG-NEXT:    v_exp_f32_e32 v0, v0
+; SI-SDAG-NEXT:    s_and_b64 s[2:3], vcc, exec
+; SI-SDAG-NEXT:    s_cselect_b32 s2, 0xffffffc0, 0
+; SI-SDAG-NEXT:    s_and_b64 s[0:1], s[0:1], exec
 ; SI-SDAG-NEXT:    s_cselect_b32 s0, 0xffffffc0, 0
-; SI-SDAG-NEXT:    v_ldexp_f32_e64 v1, v2, s0
-; SI-SDAG-NEXT:    s_and_b64 s[0:1], vcc, exec
-; SI-SDAG-NEXT:    s_cselect_b32 s0, 0xffffffc0, 0
+; SI-SDAG-NEXT:    v_ldexp_f32_e64 v1, v1, s2
 ; SI-SDAG-NEXT:    v_ldexp_f32_e64 v0, v0, s0
 ; SI-SDAG-NEXT:    buffer_store_dwordx2 v[0:1], off, s[4:7], 0
 ; SI-SDAG-NEXT:    s_endpgm

@@ -53,24 +53,22 @@ define amdgpu_kernel void @v_alignbyte_b32_2(ptr addrspace(1) %out, ptr addrspac
 ; GCN:       ; %bb.0:
 ; GCN-NEXT:    s_load_dwordx4 s[0:3], s[4:5], 0x9
 ; GCN-NEXT:    s_load_dwordx2 s[8:9], s[4:5], 0xd
-; GCN-NEXT:    s_load_dword s16, s[4:5], 0xf
-; GCN-NEXT:    s_mov_b32 s7, 0xf000
-; GCN-NEXT:    s_mov_b32 s14, 0
+; GCN-NEXT:    s_load_dword s12, s[4:5], 0xf
 ; GCN-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
-; GCN-NEXT:    v_mov_b32_e32 v1, 0
-; GCN-NEXT:    s_mov_b32 s15, s7
-; GCN-NEXT:    s_mov_b64 s[10:11], s[14:15]
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
-; GCN-NEXT:    s_mov_b64 s[12:13], s[2:3]
-; GCN-NEXT:    buffer_load_dword v2, v[0:1], s[12:15], 0 addr64 glc
+; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
+; GCN-NEXT:    s_mov_b32 s3, 0xf000
+; GCN-NEXT:    s_mov_b32 s6, 0
+; GCN-NEXT:    v_mov_b32_e32 v1, 0
+; GCN-NEXT:    s_mov_b32 s7, s3
+; GCN-NEXT:    s_mov_b64 s[10:11], s[6:7]
+; GCN-NEXT:    buffer_load_dword v2, v[0:1], s[4:7], 0 addr64 glc
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    buffer_load_dword v0, v[0:1], s[8:11], 0 addr64 glc
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
-; GCN-NEXT:    s_mov_b32 s6, -1
-; GCN-NEXT:    s_mov_b32 s4, s0
-; GCN-NEXT:    s_mov_b32 s5, s1
-; GCN-NEXT:    v_alignbyte_b32 v0, v2, v0, s16
-; GCN-NEXT:    buffer_store_dword v0, off, s[4:7], 0
+; GCN-NEXT:    s_mov_b32 s2, -1
+; GCN-NEXT:    v_alignbyte_b32 v0, v2, v0, s12
+; GCN-NEXT:    buffer_store_dword v0, off, s[0:3], 0
 ; GCN-NEXT:    s_endpgm
 ;
 ; GFX11-TRUE16-LABEL: v_alignbyte_b32_2:

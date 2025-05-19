@@ -46,10 +46,10 @@ define amdgpu_kernel void @truncstore_arg_v16i32_to_v16i8(ptr addrspace(1) %out,
 ; SI-NEXT:    s_or_b32 s7, s7, s10
 ; SI-NEXT:    s_and_b32 s8, s8, 0xffff
 ; SI-NEXT:    s_or_b32 s7, s8, s7
-; SI-NEXT:    v_mov_b32_e32 v0, s7
 ; SI-NEXT:    v_mov_b32_e32 v1, s6
 ; SI-NEXT:    v_mov_b32_e32 v2, s5
 ; SI-NEXT:    v_mov_b32_e32 v3, s4
+; SI-NEXT:    v_mov_b32_e32 v0, s7
 ; SI-NEXT:    buffer_store_dwordx4 v[0:3], off, s[0:3], 0
 ; SI-NEXT:    s_endpgm
 ;
@@ -95,10 +95,10 @@ define amdgpu_kernel void @truncstore_arg_v16i32_to_v16i8(ptr addrspace(1) %out,
 ; VI-NEXT:    s_and_b32 s6, s6, 0xffff
 ; VI-NEXT:    s_or_b32 s5, s6, s5
 ; VI-NEXT:    v_mov_b32_e32 v5, s1
-; VI-NEXT:    v_mov_b32_e32 v0, s5
 ; VI-NEXT:    v_mov_b32_e32 v1, s4
 ; VI-NEXT:    v_mov_b32_e32 v2, s3
 ; VI-NEXT:    v_mov_b32_e32 v3, s2
+; VI-NEXT:    v_mov_b32_e32 v0, s5
 ; VI-NEXT:    v_mov_b32_e32 v4, s0
 ; VI-NEXT:    flat_store_dwordx4 v[4:5], v[0:3]
 ; VI-NEXT:    s_endpgm
@@ -152,10 +152,10 @@ define amdgpu_kernel void @truncstore_arg_v16i64_to_v16i8(ptr addrspace(1) %out,
 ; SI-NEXT:    s_and_b32 s0, s0, 0xffff
 ; SI-NEXT:    s_or_b32 s5, s7, s5
 ; SI-NEXT:    s_or_b32 s0, s0, s4
-; SI-NEXT:    v_mov_b32_e32 v0, s0
 ; SI-NEXT:    v_mov_b32_e32 v1, s5
 ; SI-NEXT:    v_mov_b32_e32 v2, s3
 ; SI-NEXT:    v_mov_b32_e32 v3, s1
+; SI-NEXT:    v_mov_b32_e32 v0, s0
 ; SI-NEXT:    buffer_store_dwordx4 v[0:3], off, s[36:39], 0
 ; SI-NEXT:    s_endpgm
 ;
@@ -202,10 +202,10 @@ define amdgpu_kernel void @truncstore_arg_v16i64_to_v16i8(ptr addrspace(1) %out,
 ; VI-NEXT:    s_or_b32 s5, s7, s5
 ; VI-NEXT:    s_or_b32 s0, s0, s4
 ; VI-NEXT:    v_mov_b32_e32 v4, s34
-; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v1, s5
 ; VI-NEXT:    v_mov_b32_e32 v2, s3
 ; VI-NEXT:    v_mov_b32_e32 v3, s1
+; VI-NEXT:    v_mov_b32_e32 v0, s0
 ; VI-NEXT:    v_mov_b32_e32 v5, s35
 ; VI-NEXT:    flat_store_dwordx4 v[4:5], v[0:3]
 ; VI-NEXT:    s_endpgm

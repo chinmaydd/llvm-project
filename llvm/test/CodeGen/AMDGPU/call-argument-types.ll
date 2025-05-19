@@ -5397,23 +5397,38 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; VI-NEXT:    s_mov_b32 s54, -1
 ; VI-NEXT:    s_mov_b32 s55, 0xe80000
 ; VI-NEXT:    s_add_u32 s52, s52, s5
-; VI-NEXT:    s_load_dwordx16 s[8:23], s[2:3], 0x64
-; VI-NEXT:    s_load_dwordx2 s[4:5], s[2:3], 0xa4
+; VI-NEXT:    s_load_dwordx16 s[4:19], s[2:3], 0x64
+; VI-NEXT:    s_load_dwordx2 s[20:21], s[2:3], 0xa4
 ; VI-NEXT:    s_load_dwordx16 s[36:51], s[2:3], 0x24
 ; VI-NEXT:    s_mov_b32 s32, 0
 ; VI-NEXT:    s_addc_u32 s53, s53, 0
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v0, s23
+; VI-NEXT:    v_mov_b32_e32 v0, s19
 ; VI-NEXT:    buffer_store_dword v0, off, s[52:55], s32
-; VI-NEXT:    v_mov_b32_e32 v0, s4
-; VI-NEXT:    buffer_store_dword v0, off, s[52:55], s32 offset:4
-; VI-NEXT:    v_mov_b32_e32 v0, s5
+; VI-NEXT:    v_mov_b32_e32 v0, s21
+; VI-NEXT:    v_mov_b32_e32 v1, s20
+; VI-NEXT:    v_mov_b32_e32 v18, s6
+; VI-NEXT:    v_mov_b32_e32 v19, s7
 ; VI-NEXT:    s_mov_b64 s[6:7], s[0:1]
 ; VI-NEXT:    s_mov_b64 s[0:1], s[52:53]
+; VI-NEXT:    buffer_store_dword v1, off, s[52:55], s32 offset:4
 ; VI-NEXT:    buffer_store_dword v0, off, s[52:55], s32 offset:8
-; VI-NEXT:    s_getpc_b64 s[4:5]
-; VI-NEXT:    s_add_u32 s4, s4, stack_passed_f64_arg@rel32@lo+4
-; VI-NEXT:    s_addc_u32 s5, s5, stack_passed_f64_arg@rel32@hi+12
+; VI-NEXT:    s_getpc_b64 s[20:21]
+; VI-NEXT:    s_add_u32 s20, s20, stack_passed_f64_arg@rel32@lo+4
+; VI-NEXT:    s_addc_u32 s21, s21, stack_passed_f64_arg@rel32@hi+12
+; VI-NEXT:    v_mov_b32_e32 v16, s4
+; VI-NEXT:    v_mov_b32_e32 v17, s5
+; VI-NEXT:    v_mov_b32_e32 v20, s8
+; VI-NEXT:    v_mov_b32_e32 v21, s9
+; VI-NEXT:    v_mov_b32_e32 v22, s10
+; VI-NEXT:    v_mov_b32_e32 v23, s11
+; VI-NEXT:    v_mov_b32_e32 v24, s12
+; VI-NEXT:    v_mov_b32_e32 v25, s13
+; VI-NEXT:    v_mov_b32_e32 v26, s14
+; VI-NEXT:    v_mov_b32_e32 v27, s15
+; VI-NEXT:    v_mov_b32_e32 v28, s16
+; VI-NEXT:    v_mov_b32_e32 v29, s17
+; VI-NEXT:    v_mov_b32_e32 v30, s18
 ; VI-NEXT:    s_mov_b64 s[2:3], s[54:55]
 ; VI-NEXT:    v_mov_b32_e32 v0, s36
 ; VI-NEXT:    v_mov_b32_e32 v1, s37
@@ -5431,22 +5446,7 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; VI-NEXT:    v_mov_b32_e32 v13, s49
 ; VI-NEXT:    v_mov_b32_e32 v14, s50
 ; VI-NEXT:    v_mov_b32_e32 v15, s51
-; VI-NEXT:    v_mov_b32_e32 v16, s8
-; VI-NEXT:    v_mov_b32_e32 v17, s9
-; VI-NEXT:    v_mov_b32_e32 v18, s10
-; VI-NEXT:    v_mov_b32_e32 v19, s11
-; VI-NEXT:    v_mov_b32_e32 v20, s12
-; VI-NEXT:    v_mov_b32_e32 v21, s13
-; VI-NEXT:    v_mov_b32_e32 v22, s14
-; VI-NEXT:    v_mov_b32_e32 v23, s15
-; VI-NEXT:    v_mov_b32_e32 v24, s16
-; VI-NEXT:    v_mov_b32_e32 v25, s17
-; VI-NEXT:    v_mov_b32_e32 v26, s18
-; VI-NEXT:    v_mov_b32_e32 v27, s19
-; VI-NEXT:    v_mov_b32_e32 v28, s20
-; VI-NEXT:    v_mov_b32_e32 v29, s21
-; VI-NEXT:    v_mov_b32_e32 v30, s22
-; VI-NEXT:    s_swappc_b64 s[30:31], s[4:5]
+; VI-NEXT:    s_swappc_b64 s[30:31], s[20:21]
 ; VI-NEXT:    s_endpgm
 ;
 ; CI-LABEL: stack_passed_arg_alignment_v32i32_f64:
@@ -5456,23 +5456,38 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; CI-NEXT:    s_mov_b32 s54, -1
 ; CI-NEXT:    s_mov_b32 s55, 0xe8f000
 ; CI-NEXT:    s_add_u32 s52, s52, s5
-; CI-NEXT:    s_load_dwordx16 s[8:23], s[2:3], 0x19
-; CI-NEXT:    s_load_dwordx2 s[4:5], s[2:3], 0x29
+; CI-NEXT:    s_load_dwordx16 s[4:19], s[2:3], 0x19
+; CI-NEXT:    s_load_dwordx2 s[20:21], s[2:3], 0x29
 ; CI-NEXT:    s_load_dwordx16 s[36:51], s[2:3], 0x9
 ; CI-NEXT:    s_mov_b32 s32, 0
 ; CI-NEXT:    s_addc_u32 s53, s53, 0
 ; CI-NEXT:    s_waitcnt lgkmcnt(0)
-; CI-NEXT:    v_mov_b32_e32 v0, s23
+; CI-NEXT:    v_mov_b32_e32 v0, s19
 ; CI-NEXT:    buffer_store_dword v0, off, s[52:55], s32
-; CI-NEXT:    v_mov_b32_e32 v0, s4
-; CI-NEXT:    buffer_store_dword v0, off, s[52:55], s32 offset:4
-; CI-NEXT:    v_mov_b32_e32 v0, s5
+; CI-NEXT:    v_mov_b32_e32 v0, s21
+; CI-NEXT:    v_mov_b32_e32 v1, s20
+; CI-NEXT:    v_mov_b32_e32 v18, s6
+; CI-NEXT:    v_mov_b32_e32 v19, s7
 ; CI-NEXT:    s_mov_b64 s[6:7], s[0:1]
 ; CI-NEXT:    s_mov_b64 s[0:1], s[52:53]
+; CI-NEXT:    buffer_store_dword v1, off, s[52:55], s32 offset:4
 ; CI-NEXT:    buffer_store_dword v0, off, s[52:55], s32 offset:8
-; CI-NEXT:    s_getpc_b64 s[4:5]
-; CI-NEXT:    s_add_u32 s4, s4, stack_passed_f64_arg@rel32@lo+4
-; CI-NEXT:    s_addc_u32 s5, s5, stack_passed_f64_arg@rel32@hi+12
+; CI-NEXT:    s_getpc_b64 s[20:21]
+; CI-NEXT:    s_add_u32 s20, s20, stack_passed_f64_arg@rel32@lo+4
+; CI-NEXT:    s_addc_u32 s21, s21, stack_passed_f64_arg@rel32@hi+12
+; CI-NEXT:    v_mov_b32_e32 v16, s4
+; CI-NEXT:    v_mov_b32_e32 v17, s5
+; CI-NEXT:    v_mov_b32_e32 v20, s8
+; CI-NEXT:    v_mov_b32_e32 v21, s9
+; CI-NEXT:    v_mov_b32_e32 v22, s10
+; CI-NEXT:    v_mov_b32_e32 v23, s11
+; CI-NEXT:    v_mov_b32_e32 v24, s12
+; CI-NEXT:    v_mov_b32_e32 v25, s13
+; CI-NEXT:    v_mov_b32_e32 v26, s14
+; CI-NEXT:    v_mov_b32_e32 v27, s15
+; CI-NEXT:    v_mov_b32_e32 v28, s16
+; CI-NEXT:    v_mov_b32_e32 v29, s17
+; CI-NEXT:    v_mov_b32_e32 v30, s18
 ; CI-NEXT:    s_mov_b64 s[2:3], s[54:55]
 ; CI-NEXT:    v_mov_b32_e32 v0, s36
 ; CI-NEXT:    v_mov_b32_e32 v1, s37
@@ -5490,22 +5505,7 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; CI-NEXT:    v_mov_b32_e32 v13, s49
 ; CI-NEXT:    v_mov_b32_e32 v14, s50
 ; CI-NEXT:    v_mov_b32_e32 v15, s51
-; CI-NEXT:    v_mov_b32_e32 v16, s8
-; CI-NEXT:    v_mov_b32_e32 v17, s9
-; CI-NEXT:    v_mov_b32_e32 v18, s10
-; CI-NEXT:    v_mov_b32_e32 v19, s11
-; CI-NEXT:    v_mov_b32_e32 v20, s12
-; CI-NEXT:    v_mov_b32_e32 v21, s13
-; CI-NEXT:    v_mov_b32_e32 v22, s14
-; CI-NEXT:    v_mov_b32_e32 v23, s15
-; CI-NEXT:    v_mov_b32_e32 v24, s16
-; CI-NEXT:    v_mov_b32_e32 v25, s17
-; CI-NEXT:    v_mov_b32_e32 v26, s18
-; CI-NEXT:    v_mov_b32_e32 v27, s19
-; CI-NEXT:    v_mov_b32_e32 v28, s20
-; CI-NEXT:    v_mov_b32_e32 v29, s21
-; CI-NEXT:    v_mov_b32_e32 v30, s22
-; CI-NEXT:    s_swappc_b64 s[30:31], s[4:5]
+; CI-NEXT:    s_swappc_b64 s[30:31], s[20:21]
 ; CI-NEXT:    s_endpgm
 ;
 ; GFX9-LABEL: stack_passed_arg_alignment_v32i32_f64:
@@ -5515,23 +5515,38 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; GFX9-NEXT:    s_mov_b32 s54, -1
 ; GFX9-NEXT:    s_mov_b32 s55, 0xe00000
 ; GFX9-NEXT:    s_add_u32 s52, s52, s5
-; GFX9-NEXT:    s_load_dwordx16 s[8:23], s[2:3], 0x64
-; GFX9-NEXT:    s_load_dwordx2 s[4:5], s[2:3], 0xa4
+; GFX9-NEXT:    s_load_dwordx16 s[4:19], s[2:3], 0x64
+; GFX9-NEXT:    s_load_dwordx2 s[20:21], s[2:3], 0xa4
 ; GFX9-NEXT:    s_load_dwordx16 s[36:51], s[2:3], 0x24
 ; GFX9-NEXT:    s_mov_b32 s32, 0
 ; GFX9-NEXT:    s_addc_u32 s53, s53, 0
 ; GFX9-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX9-NEXT:    v_mov_b32_e32 v0, s23
+; GFX9-NEXT:    v_mov_b32_e32 v0, s19
 ; GFX9-NEXT:    buffer_store_dword v0, off, s[52:55], s32
-; GFX9-NEXT:    v_mov_b32_e32 v0, s4
-; GFX9-NEXT:    buffer_store_dword v0, off, s[52:55], s32 offset:4
-; GFX9-NEXT:    v_mov_b32_e32 v0, s5
+; GFX9-NEXT:    v_mov_b32_e32 v0, s21
+; GFX9-NEXT:    v_mov_b32_e32 v1, s20
+; GFX9-NEXT:    v_mov_b32_e32 v18, s6
+; GFX9-NEXT:    v_mov_b32_e32 v19, s7
 ; GFX9-NEXT:    s_mov_b64 s[6:7], s[0:1]
 ; GFX9-NEXT:    s_mov_b64 s[0:1], s[52:53]
+; GFX9-NEXT:    buffer_store_dword v1, off, s[52:55], s32 offset:4
 ; GFX9-NEXT:    buffer_store_dword v0, off, s[52:55], s32 offset:8
-; GFX9-NEXT:    s_getpc_b64 s[4:5]
-; GFX9-NEXT:    s_add_u32 s4, s4, stack_passed_f64_arg@rel32@lo+4
-; GFX9-NEXT:    s_addc_u32 s5, s5, stack_passed_f64_arg@rel32@hi+12
+; GFX9-NEXT:    s_getpc_b64 s[20:21]
+; GFX9-NEXT:    s_add_u32 s20, s20, stack_passed_f64_arg@rel32@lo+4
+; GFX9-NEXT:    s_addc_u32 s21, s21, stack_passed_f64_arg@rel32@hi+12
+; GFX9-NEXT:    v_mov_b32_e32 v16, s4
+; GFX9-NEXT:    v_mov_b32_e32 v17, s5
+; GFX9-NEXT:    v_mov_b32_e32 v20, s8
+; GFX9-NEXT:    v_mov_b32_e32 v21, s9
+; GFX9-NEXT:    v_mov_b32_e32 v22, s10
+; GFX9-NEXT:    v_mov_b32_e32 v23, s11
+; GFX9-NEXT:    v_mov_b32_e32 v24, s12
+; GFX9-NEXT:    v_mov_b32_e32 v25, s13
+; GFX9-NEXT:    v_mov_b32_e32 v26, s14
+; GFX9-NEXT:    v_mov_b32_e32 v27, s15
+; GFX9-NEXT:    v_mov_b32_e32 v28, s16
+; GFX9-NEXT:    v_mov_b32_e32 v29, s17
+; GFX9-NEXT:    v_mov_b32_e32 v30, s18
 ; GFX9-NEXT:    s_mov_b64 s[2:3], s[54:55]
 ; GFX9-NEXT:    v_mov_b32_e32 v0, s36
 ; GFX9-NEXT:    v_mov_b32_e32 v1, s37
@@ -5549,59 +5564,46 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; GFX9-NEXT:    v_mov_b32_e32 v13, s49
 ; GFX9-NEXT:    v_mov_b32_e32 v14, s50
 ; GFX9-NEXT:    v_mov_b32_e32 v15, s51
-; GFX9-NEXT:    v_mov_b32_e32 v16, s8
-; GFX9-NEXT:    v_mov_b32_e32 v17, s9
-; GFX9-NEXT:    v_mov_b32_e32 v18, s10
-; GFX9-NEXT:    v_mov_b32_e32 v19, s11
-; GFX9-NEXT:    v_mov_b32_e32 v20, s12
-; GFX9-NEXT:    v_mov_b32_e32 v21, s13
-; GFX9-NEXT:    v_mov_b32_e32 v22, s14
-; GFX9-NEXT:    v_mov_b32_e32 v23, s15
-; GFX9-NEXT:    v_mov_b32_e32 v24, s16
-; GFX9-NEXT:    v_mov_b32_e32 v25, s17
-; GFX9-NEXT:    v_mov_b32_e32 v26, s18
-; GFX9-NEXT:    v_mov_b32_e32 v27, s19
-; GFX9-NEXT:    v_mov_b32_e32 v28, s20
-; GFX9-NEXT:    v_mov_b32_e32 v29, s21
-; GFX9-NEXT:    v_mov_b32_e32 v30, s22
-; GFX9-NEXT:    s_swappc_b64 s[30:31], s[4:5]
+; GFX9-NEXT:    s_swappc_b64 s[30:31], s[20:21]
 ; GFX9-NEXT:    s_endpgm
 ;
 ; GFX11-LABEL: stack_passed_arg_alignment_v32i32_f64:
 ; GFX11:       ; %bb.0: ; %entry
-; GFX11-NEXT:    s_clause 0x2
-; GFX11-NEXT:    s_load_b64 s[20:21], s[2:3], 0xa4
-; GFX11-NEXT:    s_load_b512 s[4:19], s[2:3], 0x64
-; GFX11-NEXT:    s_load_b512 s[36:51], s[2:3], 0x24
+; GFX11-NEXT:    s_clause 0x1
+; GFX11-NEXT:    s_load_b64 s[4:5], s[2:3], 0xa4
+; GFX11-NEXT:    s_load_b512 s[36:51], s[2:3], 0x64
 ; GFX11-NEXT:    s_mov_b32 s32, 0
 ; GFX11-NEXT:    s_delay_alu instid0(SALU_CYCLE_1)
-; GFX11-NEXT:    s_add_i32 s22, s32, 8
+; GFX11-NEXT:    s_add_i32 s20, s32, 8
+; GFX11-NEXT:    s_add_i32 s21, s32, 4
 ; GFX11-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX11-NEXT:    v_dual_mov_b32 v0, s21 :: v_dual_mov_b32 v1, s20
-; GFX11-NEXT:    v_mov_b32_e32 v2, s19
-; GFX11-NEXT:    s_add_i32 s19, s32, 4
-; GFX11-NEXT:    v_dual_mov_b32 v4, s40 :: v_dual_mov_b32 v7, s43
-; GFX11-NEXT:    scratch_store_b32 off, v0, s22
-; GFX11-NEXT:    scratch_store_b32 off, v1, s19
+; GFX11-NEXT:    v_dual_mov_b32 v0, s4 :: v_dual_mov_b32 v1, s5
+; GFX11-NEXT:    s_load_b512 s[4:19], s[2:3], 0x24
+; GFX11-NEXT:    v_dual_mov_b32 v2, s51 :: v_dual_mov_b32 v17, s37
+; GFX11-NEXT:    scratch_store_b32 off, v1, s20
+; GFX11-NEXT:    scratch_store_b32 off, v0, s21
 ; GFX11-NEXT:    scratch_store_b32 off, v2, s32
-; GFX11-NEXT:    v_dual_mov_b32 v0, s36 :: v_dual_mov_b32 v3, s39
-; GFX11-NEXT:    v_dual_mov_b32 v1, s37 :: v_dual_mov_b32 v2, s38
-; GFX11-NEXT:    v_dual_mov_b32 v5, s41 :: v_dual_mov_b32 v6, s42
-; GFX11-NEXT:    v_dual_mov_b32 v9, s45 :: v_dual_mov_b32 v8, s44
-; GFX11-NEXT:    v_dual_mov_b32 v11, s47 :: v_dual_mov_b32 v10, s46
-; GFX11-NEXT:    v_dual_mov_b32 v13, s49 :: v_dual_mov_b32 v12, s48
-; GFX11-NEXT:    v_dual_mov_b32 v15, s51 :: v_dual_mov_b32 v14, s50
-; GFX11-NEXT:    v_dual_mov_b32 v17, s5 :: v_dual_mov_b32 v16, s4
-; GFX11-NEXT:    v_dual_mov_b32 v19, s7 :: v_dual_mov_b32 v18, s6
-; GFX11-NEXT:    v_dual_mov_b32 v21, s9 :: v_dual_mov_b32 v20, s8
-; GFX11-NEXT:    v_dual_mov_b32 v23, s11 :: v_dual_mov_b32 v22, s10
-; GFX11-NEXT:    v_dual_mov_b32 v25, s13 :: v_dual_mov_b32 v24, s12
-; GFX11-NEXT:    v_dual_mov_b32 v27, s15 :: v_dual_mov_b32 v26, s14
-; GFX11-NEXT:    v_dual_mov_b32 v29, s17 :: v_dual_mov_b32 v28, s16
-; GFX11-NEXT:    v_mov_b32_e32 v30, s18
+; GFX11-NEXT:    v_dual_mov_b32 v16, s36 :: v_dual_mov_b32 v19, s39
+; GFX11-NEXT:    v_dual_mov_b32 v18, s38 :: v_dual_mov_b32 v21, s41
+; GFX11-NEXT:    v_dual_mov_b32 v20, s40 :: v_dual_mov_b32 v23, s43
+; GFX11-NEXT:    v_dual_mov_b32 v22, s42 :: v_dual_mov_b32 v25, s45
+; GFX11-NEXT:    v_dual_mov_b32 v24, s44 :: v_dual_mov_b32 v27, s47
+; GFX11-NEXT:    v_dual_mov_b32 v26, s46 :: v_dual_mov_b32 v29, s49
+; GFX11-NEXT:    v_mov_b32_e32 v28, s48
+; GFX11-NEXT:    v_mov_b32_e32 v30, s50
 ; GFX11-NEXT:    s_getpc_b64 s[2:3]
 ; GFX11-NEXT:    s_add_u32 s2, s2, stack_passed_f64_arg@rel32@lo+4
 ; GFX11-NEXT:    s_addc_u32 s3, s3, stack_passed_f64_arg@rel32@hi+12
+; GFX11-NEXT:    s_waitcnt lgkmcnt(0)
+; GFX11-NEXT:    v_dual_mov_b32 v3, s7 :: v_dual_mov_b32 v0, s4
+; GFX11-NEXT:    v_mov_b32_e32 v5, s9
+; GFX11-NEXT:    v_dual_mov_b32 v1, s5 :: v_dual_mov_b32 v2, s6
+; GFX11-NEXT:    v_dual_mov_b32 v7, s11 :: v_dual_mov_b32 v4, s8
+; GFX11-NEXT:    v_dual_mov_b32 v9, s13 :: v_dual_mov_b32 v6, s10
+; GFX11-NEXT:    v_dual_mov_b32 v11, s15 :: v_dual_mov_b32 v8, s12
+; GFX11-NEXT:    v_dual_mov_b32 v13, s17 :: v_dual_mov_b32 v10, s14
+; GFX11-NEXT:    v_dual_mov_b32 v15, s19 :: v_dual_mov_b32 v12, s16
+; GFX11-NEXT:    v_mov_b32_e32 v14, s18
 ; GFX11-NEXT:    s_mov_b64 s[6:7], s[0:1]
 ; GFX11-NEXT:    s_swappc_b64 s[30:31], s[2:3]
 ; GFX11-NEXT:    s_endpgm
@@ -5620,13 +5622,28 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; HSA-NEXT:    s_waitcnt lgkmcnt(0)
 ; HSA-NEXT:    v_mov_b32_e32 v0, s23
 ; HSA-NEXT:    buffer_store_dword v0, off, s[0:3], s32
-; HSA-NEXT:    v_mov_b32_e32 v0, s24
-; HSA-NEXT:    buffer_store_dword v0, off, s[0:3], s32 offset:4
 ; HSA-NEXT:    v_mov_b32_e32 v0, s25
+; HSA-NEXT:    v_mov_b32_e32 v1, s24
+; HSA-NEXT:    buffer_store_dword v1, off, s[0:3], s32 offset:4
 ; HSA-NEXT:    buffer_store_dword v0, off, s[0:3], s32 offset:8
 ; HSA-NEXT:    s_getpc_b64 s[24:25]
 ; HSA-NEXT:    s_add_u32 s24, s24, stack_passed_f64_arg@rel32@lo+4
 ; HSA-NEXT:    s_addc_u32 s25, s25, stack_passed_f64_arg@rel32@hi+12
+; HSA-NEXT:    v_mov_b32_e32 v16, s8
+; HSA-NEXT:    v_mov_b32_e32 v17, s9
+; HSA-NEXT:    v_mov_b32_e32 v18, s10
+; HSA-NEXT:    v_mov_b32_e32 v19, s11
+; HSA-NEXT:    v_mov_b32_e32 v20, s12
+; HSA-NEXT:    v_mov_b32_e32 v21, s13
+; HSA-NEXT:    v_mov_b32_e32 v22, s14
+; HSA-NEXT:    v_mov_b32_e32 v23, s15
+; HSA-NEXT:    v_mov_b32_e32 v24, s16
+; HSA-NEXT:    v_mov_b32_e32 v25, s17
+; HSA-NEXT:    v_mov_b32_e32 v26, s18
+; HSA-NEXT:    v_mov_b32_e32 v27, s19
+; HSA-NEXT:    v_mov_b32_e32 v28, s20
+; HSA-NEXT:    v_mov_b32_e32 v29, s21
+; HSA-NEXT:    v_mov_b32_e32 v30, s22
 ; HSA-NEXT:    s_mov_b64 s[6:7], s[4:5]
 ; HSA-NEXT:    v_mov_b32_e32 v0, s36
 ; HSA-NEXT:    v_mov_b32_e32 v1, s37
@@ -5644,21 +5661,6 @@ define amdgpu_kernel void @stack_passed_arg_alignment_v32i32_f64(<32 x i32> %val
 ; HSA-NEXT:    v_mov_b32_e32 v13, s49
 ; HSA-NEXT:    v_mov_b32_e32 v14, s50
 ; HSA-NEXT:    v_mov_b32_e32 v15, s51
-; HSA-NEXT:    v_mov_b32_e32 v16, s8
-; HSA-NEXT:    v_mov_b32_e32 v17, s9
-; HSA-NEXT:    v_mov_b32_e32 v18, s10
-; HSA-NEXT:    v_mov_b32_e32 v19, s11
-; HSA-NEXT:    v_mov_b32_e32 v20, s12
-; HSA-NEXT:    v_mov_b32_e32 v21, s13
-; HSA-NEXT:    v_mov_b32_e32 v22, s14
-; HSA-NEXT:    v_mov_b32_e32 v23, s15
-; HSA-NEXT:    v_mov_b32_e32 v24, s16
-; HSA-NEXT:    v_mov_b32_e32 v25, s17
-; HSA-NEXT:    v_mov_b32_e32 v26, s18
-; HSA-NEXT:    v_mov_b32_e32 v27, s19
-; HSA-NEXT:    v_mov_b32_e32 v28, s20
-; HSA-NEXT:    v_mov_b32_e32 v29, s21
-; HSA-NEXT:    v_mov_b32_e32 v30, s22
 ; HSA-NEXT:    s_swappc_b64 s[30:31], s[24:25]
 ; HSA-NEXT:    s_endpgm
 entry:

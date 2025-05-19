@@ -55,7 +55,7 @@ define amdgpu_ps <2 x i32> @uniform_v_to_s_2_i32(<2 x float> inreg %a, <2 x floa
 define amdgpu_ps ptr @uniform_v_to_s_ptr(ptr inreg %x) {
 ; GFX11-LABEL: uniform_v_to_s_ptr:
 ; GFX11:       ; %bb.0:
-; GFX11-NEXT:    v_dual_mov_b32 v0, s0 :: v_dual_mov_b32 v1, s1
+; GFX11-NEXT:    v_dual_mov_b32 v1, s1 :: v_dual_mov_b32 v0, s0
 ; GFX11-NEXT:    s_mov_b32 s1, 0
 ; GFX11-NEXT:    flat_load_b32 v0, v[0:1]
 ; GFX11-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0)

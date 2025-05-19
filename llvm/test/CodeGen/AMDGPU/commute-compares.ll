@@ -349,8 +349,8 @@ define amdgpu_kernel void @commute_eq_64_i64(ptr addrspace(1) %out, ptr addrspac
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_eq_u64_e32 vcc, 64, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -377,8 +377,8 @@ define amdgpu_kernel void @commute_ne_64_i64(ptr addrspace(1) %out, ptr addrspac
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_ne_u64_e32 vcc, 64, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -405,8 +405,8 @@ define amdgpu_kernel void @commute_ugt_64_i64(ptr addrspace(1) %out, ptr addrspa
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_lt_u64_e32 vcc, 64, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -433,8 +433,8 @@ define amdgpu_kernel void @commute_uge_64_i64(ptr addrspace(1) %out, ptr addrspa
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_lt_u64_e32 vcc, 63, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -461,8 +461,8 @@ define amdgpu_kernel void @commute_ult_64_i64(ptr addrspace(1) %out, ptr addrspa
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_gt_u64_e32 vcc, 64, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -489,8 +489,8 @@ define amdgpu_kernel void @commute_ule_63_i64(ptr addrspace(1) %out, ptr addrspa
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_gt_u64_e32 vcc, 64, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -519,9 +519,9 @@ define amdgpu_kernel void @commute_ule_64_i64(ptr addrspace(1) %out, ptr addrspa
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[4:5], 0x41
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_gt_u64_e32 vcc, s[4:5], v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -548,8 +548,8 @@ define amdgpu_kernel void @commute_sgt_neg1_i64(ptr addrspace(1) %out, ptr addrs
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_lt_i64_e32 vcc, -1, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -576,8 +576,8 @@ define amdgpu_kernel void @commute_sge_neg2_i64(ptr addrspace(1) %out, ptr addrs
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_lt_i64_e32 vcc, -3, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -604,8 +604,8 @@ define amdgpu_kernel void @commute_slt_neg16_i64(ptr addrspace(1) %out, ptr addr
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_gt_i64_e32 vcc, -16, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -632,8 +632,8 @@ define amdgpu_kernel void @commute_sle_5_i64(ptr addrspace(1) %out, ptr addrspac
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_gt_i64_e32 vcc, 6, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1046,8 +1046,8 @@ define amdgpu_kernel void @commute_oeq_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_eq_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1074,8 +1074,8 @@ define amdgpu_kernel void @commute_ogt_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_lt_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1102,8 +1102,8 @@ define amdgpu_kernel void @commute_oge_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_le_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1130,8 +1130,8 @@ define amdgpu_kernel void @commute_olt_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_gt_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1158,8 +1158,8 @@ define amdgpu_kernel void @commute_ole_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_ge_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1186,8 +1186,8 @@ define amdgpu_kernel void @commute_one_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_lg_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1214,8 +1214,8 @@ define amdgpu_kernel void @commute_ord_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_o_f64_e32 vcc, v[3:4], v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1242,8 +1242,8 @@ define amdgpu_kernel void @commute_ueq_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_nlg_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1270,8 +1270,8 @@ define amdgpu_kernel void @commute_ugt_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_nge_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1298,8 +1298,8 @@ define amdgpu_kernel void @commute_uge_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_ngt_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1326,8 +1326,8 @@ define amdgpu_kernel void @commute_ult_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_nle_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1354,8 +1354,8 @@ define amdgpu_kernel void @commute_ule_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_nlt_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1382,8 +1382,8 @@ define amdgpu_kernel void @commute_une_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_neq_f64_e32 vcc, 2.0, v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc
@@ -1410,8 +1410,8 @@ define amdgpu_kernel void @commute_uno_2.0_f64(ptr addrspace(1) %out, ptr addrsp
 ; GCN-NEXT:    s_waitcnt lgkmcnt(0)
 ; GCN-NEXT:    s_mov_b64 s[4:5], s[2:3]
 ; GCN-NEXT:    buffer_load_dwordx2 v[3:4], v[1:2], s[4:7], 0 addr64
-; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_mov_b64 s[2:3], s[6:7]
+; GCN-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; GCN-NEXT:    s_waitcnt vmcnt(0)
 ; GCN-NEXT:    v_cmp_u_f64_e32 vcc, v[3:4], v[3:4]
 ; GCN-NEXT:    v_cndmask_b32_e64 v0, 0, -1, vcc

@@ -9,11 +9,11 @@ define protected amdgpu_kernel void @IllegalGEPConst(i32 %a, ptr addrspace(1) %b
 ; CHECK-NEXT:    v_mov_b32_e32 v2, 0
 ; CHECK-NEXT:    s_waitcnt lgkmcnt(0)
 ; CHECK-NEXT:    s_ashr_i32 s7, s6, 31
-; CHECK-NEXT:    v_mov_b32_e32 v0, s2
+; CHECK-NEXT:    s_lshl_b64 s[4:5], s[6:7], 3
+; CHECK-NEXT:    s_add_u32 s0, s0, s4
 ; CHECK-NEXT:    v_mov_b32_e32 v1, s3
-; CHECK-NEXT:    s_lshl_b64 s[2:3], s[6:7], 3
-; CHECK-NEXT:    s_add_u32 s0, s0, s2
-; CHECK-NEXT:    s_addc_u32 s1, s1, s3
+; CHECK-NEXT:    s_addc_u32 s1, s1, s5
+; CHECK-NEXT:    v_mov_b32_e32 v0, s2
 ; CHECK-NEXT:    global_atomic_add_f64 v2, v[0:1], s[0:1] offset:-8
 ; CHECK-NEXT:    s_waitcnt vmcnt(0)
 ; CHECK-NEXT:    buffer_wbinvl1_vol

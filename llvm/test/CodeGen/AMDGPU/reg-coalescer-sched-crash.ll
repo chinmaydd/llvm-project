@@ -25,8 +25,8 @@ define amdgpu_kernel void @reg_coalescer_breaks_dead(ptr addrspace(1) nocapture 
 ; GFX6-NEXT:    s_addc_u32 s3, s7, s3
 ; GFX6-NEXT:    s_load_dwordx2 s[2:3], s[2:3], 0x0
 ; GFX6-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX6-NEXT:    v_mov_b32_e32 v1, s2
 ; GFX6-NEXT:    v_mov_b32_e32 v2, s3
+; GFX6-NEXT:    v_mov_b32_e32 v1, s2
 ; GFX6-NEXT:  .LBB0_2: ; %bb4
 ; GFX6-NEXT:    s_or_b64 exec, exec, s[0:1]
 ; GFX6-NEXT:    s_load_dword s0, s[4:5], 0xe
@@ -55,8 +55,8 @@ define amdgpu_kernel void @reg_coalescer_breaks_dead(ptr addrspace(1) nocapture 
 ; GFX8-NEXT:    s_addc_u32 s3, s7, s3
 ; GFX8-NEXT:    s_load_dwordx2 s[2:3], s[2:3], 0x0
 ; GFX8-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX8-NEXT:    v_mov_b32_e32 v1, s2
 ; GFX8-NEXT:    v_mov_b32_e32 v2, s3
+; GFX8-NEXT:    v_mov_b32_e32 v1, s2
 ; GFX8-NEXT:  .LBB0_2: ; %bb4
 ; GFX8-NEXT:    s_or_b64 exec, exec, s[0:1]
 ; GFX8-NEXT:    s_load_dword s0, s[4:5], 0x38

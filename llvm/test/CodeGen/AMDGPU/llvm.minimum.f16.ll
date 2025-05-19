@@ -841,18 +841,18 @@ define void @s_minimum_v2f16(<2 x half> inreg %src0, <2 x half> inreg %src1) {
 ; GFX900:       ; %bb.0:
 ; GFX900-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
 ; GFX900-NEXT:    v_mov_b32_e32 v0, s17
-; GFX900-NEXT:    v_mov_b32_e32 v1, s17
 ; GFX900-NEXT:    s_lshr_b32 s4, s17, 16
-; GFX900-NEXT:    v_pk_min_f16 v1, s16, v1
+; GFX900-NEXT:    v_mov_b32_e32 v1, s17
+; GFX900-NEXT:    v_pk_min_f16 v0, s16, v0
 ; GFX900-NEXT:    v_mov_b32_e32 v2, 0x7e00
-; GFX900-NEXT:    v_cmp_o_f16_e32 vcc, s16, v0
+; GFX900-NEXT:    v_cmp_o_f16_e32 vcc, s16, v1
 ; GFX900-NEXT:    s_lshr_b32 s5, s16, 16
 ; GFX900-NEXT:    v_mov_b32_e32 v3, s4
-; GFX900-NEXT:    v_cndmask_b32_e32 v0, v2, v1, vcc
+; GFX900-NEXT:    v_cndmask_b32_e32 v1, v2, v0, vcc
 ; GFX900-NEXT:    v_cmp_o_f16_e32 vcc, s5, v3
-; GFX900-NEXT:    v_cndmask_b32_sdwa v1, v2, v1, vcc dst_sel:DWORD dst_unused:UNUSED_PAD src0_sel:DWORD src1_sel:WORD_1
-; GFX900-NEXT:    v_and_b32_e32 v0, 0xffff, v0
-; GFX900-NEXT:    v_lshl_or_b32 v0, v1, 16, v0
+; GFX900-NEXT:    v_cndmask_b32_sdwa v0, v2, v0, vcc dst_sel:DWORD dst_unused:UNUSED_PAD src0_sel:DWORD src1_sel:WORD_1
+; GFX900-NEXT:    v_and_b32_e32 v1, 0xffff, v1
+; GFX900-NEXT:    v_lshl_or_b32 v0, v0, 16, v1
 ; GFX900-NEXT:    ;;#ASMSTART
 ; GFX900-NEXT:    ; use v0
 ; GFX900-NEXT:    ;;#ASMEND

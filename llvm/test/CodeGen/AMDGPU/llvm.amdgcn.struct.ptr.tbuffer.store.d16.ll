@@ -12,9 +12,9 @@ define amdgpu_kernel void @tbuffer_store_d16_x(ptr addrspace(8) %rsrc, half %dat
 ; PREGFX10-UNPACKED-NEXT:    s_load_dwordx2 s[4:5], s[8:9], 0x10
 ; PREGFX10-UNPACKED-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0
 ; PREGFX10-UNPACKED-NEXT:    s_waitcnt lgkmcnt(0)
-; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s4
-; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v1, s5
-; PREGFX10-UNPACKED-NEXT:    tbuffer_store_format_d16_x v0, v1, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
+; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s5
+; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v1, s4
+; PREGFX10-UNPACKED-NEXT:    tbuffer_store_format_d16_x v1, v0, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
 ; PREGFX10-UNPACKED-NEXT:    s_endpgm
 ;
 ; PREGFX10-PACKED-LABEL: tbuffer_store_d16_x:
@@ -22,9 +22,9 @@ define amdgpu_kernel void @tbuffer_store_d16_x(ptr addrspace(8) %rsrc, half %dat
 ; PREGFX10-PACKED-NEXT:    s_load_dwordx2 s[4:5], s[8:9], 0x10
 ; PREGFX10-PACKED-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0
 ; PREGFX10-PACKED-NEXT:    s_waitcnt lgkmcnt(0)
-; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s4
-; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s5
-; PREGFX10-PACKED-NEXT:    tbuffer_store_format_d16_x v0, v1, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
+; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s5
+; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s4
+; PREGFX10-PACKED-NEXT:    tbuffer_store_format_d16_x v1, v0, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
 ; PREGFX10-PACKED-NEXT:    s_endpgm
 ;
 ; GFX10-PACKED-LABEL: tbuffer_store_d16_x:
@@ -33,9 +33,9 @@ define amdgpu_kernel void @tbuffer_store_d16_x(ptr addrspace(8) %rsrc, half %dat
 ; GFX10-PACKED-NEXT:    s_load_dwordx2 s[4:5], s[8:9], 0x10
 ; GFX10-PACKED-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0
 ; GFX10-PACKED-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s4
-; GFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s5
-; GFX10-PACKED-NEXT:    tbuffer_store_format_d16_x v0, v1, s[0:3], 0 format:[BUF_FMT_10_11_11_SSCALED] idxen
+; GFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s5
+; GFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s4
+; GFX10-PACKED-NEXT:    tbuffer_store_format_d16_x v1, v0, s[0:3], 0 format:[BUF_FMT_10_11_11_SSCALED] idxen
 ; GFX10-PACKED-NEXT:    s_endpgm
 ;
 ; GFX11-PACKED-LABEL: tbuffer_store_d16_x:
@@ -44,9 +44,9 @@ define amdgpu_kernel void @tbuffer_store_d16_x(ptr addrspace(8) %rsrc, half %dat
 ; GFX11-PACKED-NEXT:    s_load_b64 s[6:7], s[4:5], 0x10
 ; GFX11-PACKED-NEXT:    s_load_b128 s[0:3], s[4:5], 0x0
 ; GFX11-PACKED-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX11-PACKED-NEXT:    v_mov_b32_e32 v0, s6
-; GFX11-PACKED-NEXT:    v_mov_b32_e32 v1, s7
-; GFX11-PACKED-NEXT:    tbuffer_store_d16_format_x v0, v1, s[0:3], 0 format:[BUF_FMT_10_10_10_2_SNORM] idxen
+; GFX11-PACKED-NEXT:    v_mov_b32_e32 v0, s7
+; GFX11-PACKED-NEXT:    v_mov_b32_e32 v1, s6
+; GFX11-PACKED-NEXT:    tbuffer_store_d16_format_x v1, v0, s[0:3], 0 format:[BUF_FMT_10_10_10_2_SNORM] idxen
 ; GFX11-PACKED-NEXT:    s_endpgm
 main_body:
   call void @llvm.amdgcn.struct.ptr.tbuffer.store.f16(half %data, ptr addrspace(8) %rsrc, i32 %vindex, i32 0, i32 0, i32 33, i32 0)
@@ -61,8 +61,8 @@ define amdgpu_kernel void @tbuffer_store_d16_xy(ptr addrspace(8) %rsrc, <2 x hal
 ; PREGFX10-UNPACKED-NEXT:    s_waitcnt lgkmcnt(0)
 ; PREGFX10-UNPACKED-NEXT:    s_lshr_b32 s6, s4, 16
 ; PREGFX10-UNPACKED-NEXT:    s_and_b32 s4, s4, 0xffff
-; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v1, s6
+; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v2, s5
 ; PREGFX10-UNPACKED-NEXT:    tbuffer_store_format_d16_xy v[0:1], v2, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
 ; PREGFX10-UNPACKED-NEXT:    s_endpgm
@@ -72,9 +72,9 @@ define amdgpu_kernel void @tbuffer_store_d16_xy(ptr addrspace(8) %rsrc, <2 x hal
 ; PREGFX10-PACKED-NEXT:    s_load_dwordx2 s[4:5], s[8:9], 0x10
 ; PREGFX10-PACKED-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0
 ; PREGFX10-PACKED-NEXT:    s_waitcnt lgkmcnt(0)
-; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s4
-; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s5
-; PREGFX10-PACKED-NEXT:    tbuffer_store_format_d16_xy v0, v1, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
+; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s5
+; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s4
+; PREGFX10-PACKED-NEXT:    tbuffer_store_format_d16_xy v1, v0, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
 ; PREGFX10-PACKED-NEXT:    s_endpgm
 ;
 ; GFX10-PACKED-LABEL: tbuffer_store_d16_xy:
@@ -83,9 +83,9 @@ define amdgpu_kernel void @tbuffer_store_d16_xy(ptr addrspace(8) %rsrc, <2 x hal
 ; GFX10-PACKED-NEXT:    s_load_dwordx2 s[4:5], s[8:9], 0x10
 ; GFX10-PACKED-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0
 ; GFX10-PACKED-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s4
-; GFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s5
-; GFX10-PACKED-NEXT:    tbuffer_store_format_d16_xy v0, v1, s[0:3], 0 format:[BUF_FMT_10_11_11_SSCALED] idxen
+; GFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s5
+; GFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s4
+; GFX10-PACKED-NEXT:    tbuffer_store_format_d16_xy v1, v0, s[0:3], 0 format:[BUF_FMT_10_11_11_SSCALED] idxen
 ; GFX10-PACKED-NEXT:    s_endpgm
 ;
 ; GFX11-PACKED-LABEL: tbuffer_store_d16_xy:
@@ -94,9 +94,9 @@ define amdgpu_kernel void @tbuffer_store_d16_xy(ptr addrspace(8) %rsrc, <2 x hal
 ; GFX11-PACKED-NEXT:    s_load_b64 s[6:7], s[4:5], 0x10
 ; GFX11-PACKED-NEXT:    s_load_b128 s[0:3], s[4:5], 0x0
 ; GFX11-PACKED-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX11-PACKED-NEXT:    v_mov_b32_e32 v0, s6
-; GFX11-PACKED-NEXT:    v_mov_b32_e32 v1, s7
-; GFX11-PACKED-NEXT:    tbuffer_store_d16_format_xy v0, v1, s[0:3], 0 format:[BUF_FMT_10_10_10_2_SNORM] idxen
+; GFX11-PACKED-NEXT:    v_mov_b32_e32 v0, s7
+; GFX11-PACKED-NEXT:    v_mov_b32_e32 v1, s6
+; GFX11-PACKED-NEXT:    tbuffer_store_d16_format_xy v1, v0, s[0:3], 0 format:[BUF_FMT_10_10_10_2_SNORM] idxen
 ; GFX11-PACKED-NEXT:    s_endpgm
 main_body:
   call void @llvm.amdgcn.struct.ptr.tbuffer.store.v2f16(<2 x half> %data, ptr addrspace(8) %rsrc, i32 %vindex, i32 0, i32 0, i32 33, i32 0)
@@ -113,9 +113,9 @@ define amdgpu_kernel void @tbuffer_store_d16_xyz(ptr addrspace(8) %rsrc, <4 x ha
 ; PREGFX10-UNPACKED-NEXT:    s_and_b32 s5, s5, 0xffff
 ; PREGFX10-UNPACKED-NEXT:    s_lshr_b32 s7, s4, 16
 ; PREGFX10-UNPACKED-NEXT:    s_and_b32 s4, s4, 0xffff
-; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v1, s7
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v2, s5
+; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v3, s6
 ; PREGFX10-UNPACKED-NEXT:    tbuffer_store_format_d16_xyz v[0:2], v3, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
 ; PREGFX10-UNPACKED-NEXT:    s_endpgm
@@ -127,8 +127,8 @@ define amdgpu_kernel void @tbuffer_store_d16_xyz(ptr addrspace(8) %rsrc, <4 x ha
 ; PREGFX10-PACKED-NEXT:    s_load_dwordx4 s[0:3], s[8:9], 0x0
 ; PREGFX10-PACKED-NEXT:    s_waitcnt lgkmcnt(0)
 ; PREGFX10-PACKED-NEXT:    s_and_b32 s5, s5, 0xffff
-; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v1, s5
+; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-PACKED-NEXT:    v_mov_b32_e32 v2, s6
 ; PREGFX10-PACKED-NEXT:    tbuffer_store_format_d16_xyz v[0:1], v2, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
 ; PREGFX10-PACKED-NEXT:    s_endpgm
@@ -177,10 +177,10 @@ define amdgpu_kernel void @tbuffer_store_d16_xyzw(ptr addrspace(8) %rsrc, <4 x h
 ; PREGFX10-UNPACKED-NEXT:    s_and_b32 s5, s5, 0xffff
 ; PREGFX10-UNPACKED-NEXT:    s_lshr_b32 s8, s4, 16
 ; PREGFX10-UNPACKED-NEXT:    s_and_b32 s4, s4, 0xffff
-; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v1, s8
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v2, s5
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v3, s7
+; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v0, s4
 ; PREGFX10-UNPACKED-NEXT:    v_mov_b32_e32 v4, s6
 ; PREGFX10-UNPACKED-NEXT:    tbuffer_store_format_d16_xyzw v[0:3], v4, s[0:3], 0 format:[BUF_NUM_FORMAT_USCALED] idxen
 ; PREGFX10-UNPACKED-NEXT:    s_endpgm

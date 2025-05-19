@@ -10613,8 +10613,8 @@ define inreg <6 x i16> @bitcast_v12i8_to_v6i16_scalar(<12 x i8> inreg %a, i32 in
 ; SI-NEXT:    s_lshl_b32 s8, s17, 8
 ; SI-NEXT:    s_or_b32 s6, s6, s8
 ; SI-NEXT:    s_and_b32 s6, s6, 0xffff
-; SI-NEXT:    v_mov_b32_e32 v0, s4
 ; SI-NEXT:    s_or_b32 s6, s6, s4
+; SI-NEXT:    v_mov_b32_e32 v0, s4
 ; SI-NEXT:    s_and_b32 s4, s24, 0xff
 ; SI-NEXT:    s_lshl_b32 s8, s25, 8
 ; SI-NEXT:    s_or_b32 s4, s4, s8

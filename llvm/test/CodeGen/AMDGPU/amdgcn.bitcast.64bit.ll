@@ -14582,10 +14582,10 @@ define inreg <4 x i16> @bitcast_v8i8_to_v4i16_scalar(<8 x i8> inreg %a, i32 inre
 ; SI-NEXT:    s_and_b32 s6, s16, 0xff
 ; SI-NEXT:    s_lshl_b32 s8, s17, 8
 ; SI-NEXT:    s_or_b32 s6, s6, s8
-; SI-NEXT:    v_mov_b32_e32 v0, s4
 ; SI-NEXT:    s_and_b32 s6, s6, 0xffff
-; SI-NEXT:    v_alignbit_b32 v1, s7, v0, 16
+; SI-NEXT:    v_mov_b32_e32 v0, s4
 ; SI-NEXT:    s_or_b32 s6, s6, s4
+; SI-NEXT:    v_alignbit_b32 v1, s7, v0, 16
 ; SI-NEXT:    s_lshr_b32 s8, s5, 16
 ; SI-NEXT:    s_cbranch_execnz .LBB99_3
 ; SI-NEXT:  .LBB99_2: ; %cmp.true

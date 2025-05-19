@@ -74,6 +74,7 @@ define i32 @dead_i32(i1 %cond, i32 %x, ptr addrspace(1) %ptr1) #0 {
 ; ASM-GISEL-FAKE16-NEXT:    s_wait_alu 0xfffe
 ; ASM-GISEL-FAKE16-NEXT:    s_or_b32 exec_lo, exec_lo, s0
 ; ASM-GISEL-FAKE16-NEXT:    s_setpc_b64 s[30:31]
+; ASM-DAG:       ; %bb.0: ; %entry
 entry:
   %dead = call i32 @llvm.amdgcn.dead.i32()
   br i1 %cond, label %if.then, label %if.end
@@ -221,6 +222,7 @@ define %trivial_types @dead_struct(i1 %cond, %trivial_types %x, ptr addrspace(1)
 ; ASM-GISEL-FAKE16-NEXT:    v_dual_mov_b32 v12, v13 :: v_dual_mov_b32 v13, v14
 ; ASM-GISEL-FAKE16-NEXT:    v_dual_mov_b32 v14, v15 :: v_dual_mov_b32 v15, v16
 ; ASM-GISEL-FAKE16-NEXT:    s_setpc_b64 s[30:31]
+; ASM-DAG:       ; %bb.0: ; %entry
 ; ASM-GISEL-LABEL: dead_struct:
 ; ASM-GISEL:       ; %bb.0: ; %entry
 ; ASM-GISEL-NEXT:    s_wait_loadcnt_dscnt 0x0
@@ -515,6 +517,7 @@ define [32 x i32] @dead_array(i1 %cond, [32 x i32] %x, ptr addrspace(1) %ptr1, i
 ; ASM-GISEL-FAKE16-NEXT:    s_or_b32 exec_lo, exec_lo, s0
 ; ASM-GISEL-FAKE16-NEXT:    s_wait_loadcnt 0x0
 ; ASM-GISEL-FAKE16-NEXT:    s_setpc_b64 s[30:31]
+; ASM-DAG:       ; %bb.0: ; %entry
 ; ASM-GISEL-LABEL: dead_array:
 ; ASM-GISEL:       ; %bb.0: ; %entry
 ; ASM-GISEL-NEXT:    s_wait_loadcnt_dscnt 0x0
