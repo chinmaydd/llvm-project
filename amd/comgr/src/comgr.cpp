@@ -13,22 +13,29 @@
 //===----------------------------------------------------------------------===//
 
 #include "comgr.h"
+#ifndef COMGR_MINIMAL_METADATA
 #include "comgr-compiler.h"
+#endif
 #include "comgr-device-libs.h"
+#ifndef COMGR_MINIMAL_METADATA_PURE
 #include "comgr-disassembly.h"
+#include "comgr-symbolizer.h"
+#endif
 #include "comgr-env.h"
 #include "comgr-metadata.h"
 #include "comgr-signal.h"
 #include "comgr-symbol.h"
-#include "comgr-symbolizer.h"
 
+#ifndef COMGR_MINIMAL_METADATA
 #include "clang/Basic/Version.h"
+#endif
 #include "llvm/Bitcode/BitcodeReader.h"
 #include "llvm/Demangle/Demangle.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Object/ELFObjectFile.h"
 #include "llvm/Object/ObjectFile.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/TargetSelect.h"
 #include <fstream>
 #include <mutex>
@@ -51,6 +58,13 @@
 using namespace llvm;
 using namespace COMGR;
 using namespace COMGR::TimeStatistics;
+#ifdef COMGR_MINIMAL_METADATA_PURE
+// The pure-metadata variant drops comgr-symbolizer.h, which otherwise pulls in
+// this directive. The retained metadata code (e.g.
+// amd_comgr_populate_name_expression_map) references unqualified ELF object
+// types, so restore it here.
+using namespace llvm::object;
+#endif
 
 namespace {
 bool isLanguageValid(amd_comgr_language_t Language) {
@@ -68,6 +82,7 @@ bool isSymbolInfoValid(amd_comgr_symbol_info_t SymbolInfo) {
 }
 
 
+#ifndef COMGR_MINIMAL_METADATA
 amd_comgr_status_t dispatchCompilerAction(amd_comgr_action_kind_t ActionKind,
                                           DataAction *ActionInfo,
                                           DataSet *InputSet, DataSet *ResultSet,
@@ -109,6 +124,7 @@ amd_comgr_status_t dispatchCompilerAction(amd_comgr_action_kind_t ActionKind,
     return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
   }
 }
+#endif // COMGR_MINIMAL_METADATA
 
 StringRef getLanguageName(amd_comgr_language_t Language) {
   switch (Language) {
@@ -272,6 +288,14 @@ amd_comgr_status_t COMGR::parseTargetIdentifier(StringRef IdentStr,
 }
 
 void COMGR::ensureLLVMInitialized() {
+#ifdef COMGR_MINIMAL_METADATA_PURE
+  // The pure-metadata variant drops disassembly and symbolization, the only
+  // surfaces that use the AMDGPU target backend. Metadata and symbol-table
+  // queries read object files via LLVM Object and do not require a registered
+  // target, so initialization is a no-op here. Keeping the function (rather
+  // than removing its callers) avoids touching the metadata/symbol code paths.
+  return;
+#else
 
   // LLVMInitialize<...>TargetInfo calls TargetRegistry.cpp:RegisterTarget()
   // This function is not thread safe. There may be thread safety issues
@@ -300,6 +324,7 @@ void COMGR::ensureLLVMInitialized() {
 #endif
     LLVMInitialized = true;
   }
+#endif // COMGR_MINIMAL_METADATA_PURE
 }
 
 void COMGR::clearLLVMOptions() {
@@ -680,6 +705,11 @@ amd_comgr_status_t AMD_COMGR_API
     (amd_comgr_data_t CodeObject,
      void (*PrintSymbolCallback)(const char *, void *),
      amd_comgr_symbolizer_info_t *SymbolizerInfo) {
+#ifdef COMGR_MINIMAL_METADATA_PURE
+  // Symbolization is not provided by the pure-metadata variant. The entry
+  // point is retained for ABI compatibility but is unsupported.
+  return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+#else
 
   DataObject *CodeObjectP = DataObject::convert(CodeObject);
   if (!CodeObjectP || !PrintSymbolCallback ||
@@ -691,6 +721,7 @@ amd_comgr_status_t AMD_COMGR_API
   ensureLLVMInitialized();
 
   return Symbolizer::create(CodeObjectP, PrintSymbolCallback, SymbolizerInfo);
+#endif // COMGR_MINIMAL_METADATA_PURE
 }
 
 amd_comgr_status_t AMD_COMGR_API
@@ -698,6 +729,9 @@ amd_comgr_status_t AMD_COMGR_API
     amd_comgr_destroy_symbolizer_info
     //
     (amd_comgr_symbolizer_info_t SymbolizerInfo) {
+#ifdef COMGR_MINIMAL_METADATA_PURE
+  return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+#else
 
   Symbolizer *SI = Symbolizer::convert(SymbolizerInfo);
   if (!SI) {
@@ -706,6 +740,7 @@ amd_comgr_status_t AMD_COMGR_API
 
   delete SI;
   return AMD_COMGR_STATUS_SUCCESS;
+#endif // COMGR_MINIMAL_METADATA_PURE
 }
 
 amd_comgr_status_t AMD_COMGR_API
@@ -714,6 +749,9 @@ amd_comgr_status_t AMD_COMGR_API
     //
     (amd_comgr_symbolizer_info_t SymbolizeInfo, uint64_t Address, bool IsCode,
      void *UserData) {
+#ifdef COMGR_MINIMAL_METADATA_PURE
+  return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+#else
 
   Symbolizer *SI = Symbolizer::convert(SymbolizeInfo);
   if (!SI || !UserData) {
@@ -721,6 +759,7 @@ amd_comgr_status_t AMD_COMGR_API
   }
 
   return SI->symbolize(Address, IsCode, UserData);
+#endif // COMGR_MINIMAL_METADATA_PURE
 }
 
 amd_comgr_status_t AMD_COMGR_API
@@ -1355,12 +1394,16 @@ amd_comgr_status_t AMD_COMGR_API
             << '\n'
             << " Comgr Branch-Commit: " << xstringify(AMD_COMGR_GIT_BRANCH)
             << '-' << xstringify(AMD_COMGR_GIT_COMMIT) << '\n'
-            << "\t LLVM Commit: " << clang::getLLVMRevision() << '\n';
+#ifndef COMGR_MINIMAL_METADATA
+            << "\t LLVM Commit: " << clang::getLLVMRevision() << '\n'
+#endif
+          ;
       (*LogP).flush();
     }
 
     ProfilePoint ProfileAction(getActionKindName(ActionKind));
     switch (ActionKind) {
+#ifndef COMGR_MINIMAL_METADATA
     case AMD_COMGR_ACTION_SOURCE_TO_PREPROCESSOR:
     case AMD_COMGR_ACTION_COMPILE_SOURCE_TO_BC:
     case AMD_COMGR_ACTION_UNBUNDLE:
@@ -1379,6 +1422,7 @@ amd_comgr_status_t AMD_COMGR_API
       ActionStatus = dispatchCompilerAction(ActionKind, ActionInfoP, InputSetP,
                                             ResultSetP, *LogP);
       break;
+#endif // COMGR_MINIMAL_METADATA
     case AMD_COMGR_ACTION_ADD_PRECOMPILED_HEADERS:
       // Redirect the input to the output.
       // Deprecate and remove this action.
@@ -1752,6 +1796,11 @@ amd_comgr_status_t AMD_COMGR_API
      void (*PrintInstructionCallback)(const char *, void *),
      void (*PrintAddressAnnotationCallback)(uint64_t, void *),
      amd_comgr_disassembly_info_t *DisasmInfo) {
+#ifdef COMGR_MINIMAL_METADATA_PURE
+  // Disassembly is not provided by the pure-metadata variant. The entry point
+  // is retained for ABI compatibility but is unsupported.
+  return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+#else
 
   if (!IsaName || !metadata::isValidIsaName(IsaName) || !ReadMemoryCallback ||
       !PrintInstructionCallback || !PrintAddressAnnotationCallback ||
@@ -1769,6 +1818,7 @@ amd_comgr_status_t AMD_COMGR_API
   return DisassemblyInfo::create(Ident, ReadMemoryCallback,
                                  PrintInstructionCallback,
                                  PrintAddressAnnotationCallback, DisasmInfo);
+#endif // COMGR_MINIMAL_METADATA_PURE
 }
 
 amd_comgr_status_t AMD_COMGR_API
@@ -1776,6 +1826,9 @@ amd_comgr_status_t AMD_COMGR_API
     amd_comgr_destroy_disassembly_info
     //
     (amd_comgr_disassembly_info_t DisasmInfo) {
+#ifdef COMGR_MINIMAL_METADATA_PURE
+  return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+#else
 
   DisassemblyInfo *DI = DisassemblyInfo::convert(DisasmInfo);
 
@@ -1786,6 +1839,7 @@ amd_comgr_status_t AMD_COMGR_API
   delete DI;
 
   return AMD_COMGR_STATUS_SUCCESS;
+#endif // COMGR_MINIMAL_METADATA_PURE
 }
 
 amd_comgr_status_t AMD_COMGR_API
@@ -1794,6 +1848,9 @@ amd_comgr_status_t AMD_COMGR_API
     //
     (amd_comgr_disassembly_info_t DisasmInfo, uint64_t Address, void *UserData,
      uint64_t *Size) {
+#ifdef COMGR_MINIMAL_METADATA_PURE
+  return AMD_COMGR_STATUS_ERROR_INVALID_ARGUMENT;
+#else
 
   DisassemblyInfo *DI = DisassemblyInfo::convert(DisasmInfo);
   if (!DI || !Size) {
@@ -1801,6 +1858,7 @@ amd_comgr_status_t AMD_COMGR_API
   }
 
   return DI->disassembleInstruction(Address, UserData, *Size);
+#endif // COMGR_MINIMAL_METADATA_PURE
 }
 
 amd_comgr_status_t AMD_COMGR_API
