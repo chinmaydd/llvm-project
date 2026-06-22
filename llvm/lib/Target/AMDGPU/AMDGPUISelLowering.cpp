@@ -1551,7 +1551,11 @@ SDValue AMDGPUTargetLowering::LowerGlobalAddress(AMDGPUMachineFunctionInfo *MFI,
         unsigned BarCnt = cast<GlobalVariable>(GV)->getGlobalSize(DL) / 16;
         MFI->recordNumNamedBarriers(Address.value(), BarCnt);
       }
-      return DAG.getConstant(*Address, SDLoc(Op), Op.getValueType());
+      assert((G->getOffset() == 0 ||
+              (IsNamedBarrier && G->getOffset() % 16 == 0)) &&
+             "named barrier offset must land on a barrier object");
+      return DAG.getConstant(*Address + G->getOffset(), SDLoc(Op),
+                             Op.getValueType());
     } else if (IsNamedBarrier) {
       llvm_unreachable("named barrier should have an assigned address");
     }
@@ -1580,15 +1584,17 @@ SDValue AMDGPUTargetLowering::LowerGlobalAddress(AMDGPUMachineFunctionInfo *MFI,
       return DAG.getPOISON(Op.getValueType());
     }
 
-    // XXX: What does the value of G->getOffset() mean?
-    assert(G->getOffset() == 0 &&
-         "Do not know what to do with an non-zero offset");
+    assert((G->getOffset() == 0 ||
+            (AMDGPU::isNamedBarrier(*cast<GlobalVariable>(GV)) &&
+             G->getOffset() % 16 == 0)) &&
+           "named barrier offset must land on a barrier object");
 
     // TODO: We could emit code to handle the initialization somewhere.
     // We ignore the initializer for now and legalize it to allow selection.
     // The initializer will anyway get errored out during assembly emission.
     unsigned Offset = MFI->allocateLDSGlobal(DL, *cast<GlobalVariable>(GV));
-    return DAG.getConstant(Offset, SDLoc(Op), Op.getValueType());
+    return DAG.getConstant(Offset + G->getOffset(), SDLoc(Op),
+                           Op.getValueType());
   }
   return SDValue();
 }

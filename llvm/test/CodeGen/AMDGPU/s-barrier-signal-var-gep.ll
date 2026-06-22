@@ -38,8 +38,7 @@ define amdgpu_kernel void @signal_var_bar1() {
 ; SDAG-NEXT:    s_setreg_imm32_b32 hwreg(HW_REG_WAVE_MODE, 25, 1), 1 ; msbs: dst=0 src0=0 src1=0 src2=0
 ; SDAG-NEXT:    s_mov_b32 m0, 0x400002
 ; SDAG-NEXT:    s_barrier_init m0
-; SDAG-NEXT:    s_mov_b32 m0, 2
-; SDAG-NEXT:    s_barrier_signal m0
+; SDAG-NEXT:    s_barrier_signal 2
 ; SDAG-NEXT:    s_barrier_wait 1
 ; SDAG-NEXT:    s_endpgm
 ;
