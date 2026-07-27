@@ -172,6 +172,7 @@ features cannot lower the translation-unit ABI level;
 
 - Clang now allows GNU computed `goto` extension in `constexpr` functions, matching the relaxed
   `constexpr` function body rules introduced in C++23.
+- Added `__builtin_convert_from_arbitrary_fp`, which converts an integer holding the bits of a narrow floating-point format such as `Float8E4M3FN` to a native floating-point type.
 
 ### New Compiler Flags
 
