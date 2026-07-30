@@ -1166,6 +1166,12 @@ public:
   void checkTypeSupport(QualType Ty, SourceLocation Loc,
                         ValueDecl *D = nullptr);
 
+  /// Check if the floating-point type is supported in the current language
+  /// mode and target. If \p DiagnoseTarget is true, diagnose offload code
+  /// according to whether its enclosing function is emitted.
+  bool checkFloatingPointTypeSupport(QualType Ty, SourceLocation Loc,
+                                     bool DiagnoseTarget = false);
+
   /// ImpCastExprToType - If Expr is not of type 'Type', insert an implicit
   /// cast.  If there is already an implicit cast, merge into the existing one.
   /// If isLvalue, the result of the cast is an lvalue.
@@ -2690,16 +2696,6 @@ public:
   ExprResult ConvertVectorExpr(Expr *E, TypeSourceInfo *TInfo,
                                SourceLocation BuiltinLoc,
                                SourceLocation RParenLoc);
-
-  /// ConvertFromArbitraryFPExpr - Handle __builtin_convert_from_arbitrary_fp
-  ExprResult ConvertFromArbitraryFPExpr(Expr *E, Expr *Format,
-                                        TypeSourceInfo *TInfo,
-                                        SourceLocation BuiltinLoc,
-                                        SourceLocation RParenLoc);
-
-  /// Check that \p E is an ordinary string literal naming an arbitrary
-  /// floating-point format. Returns the literal, or null after diagnosing.
-  const StringLiteral *CheckArbitraryFPFormatArg(Expr *E);
 
   static StringRef GetFormatStringTypeName(FormatStringType FST);
   static FormatStringType GetFormatStringType(StringRef FormatFlavor);
@@ -7744,16 +7740,6 @@ public:
   ExprResult ActOnConvertVectorExpr(Expr *E, ParsedType ParsedDestTy,
                                     SourceLocation BuiltinLoc,
                                     SourceLocation RParenLoc);
-
-  /// ActOnConvertFromArbitraryFPExpr - create a new convert-from-arbitrary-fp
-  /// expression from the provided arguments.
-  ///
-  /// __builtin_convert_from_arbitrary_fp( value, format, dst type )
-  ///
-  ExprResult ActOnConvertFromArbitraryFPExpr(Expr *E, Expr *Format,
-                                             ParsedType ParsedDestTy,
-                                             SourceLocation BuiltinLoc,
-                                             SourceLocation RParenLoc);
 
   //===---------------------------- OpenCL Features -----------------------===//
 
