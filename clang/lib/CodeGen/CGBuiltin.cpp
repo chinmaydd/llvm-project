@@ -4523,47 +4523,6 @@ RValue CodeGenFunction::EmitBuiltinExpr(const GlobalDecl GD, unsigned BuiltinID,
     return RValue::get(Result);
   }
 
-#define ELEMENTWISE_CONVERT_FROM_CASES(Src)                                    \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_f16:              \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_bf16:             \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_f32:              \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_f64:
-    ELEMENTWISE_CONVERT_FROM_CASES(f8e5m2)
-    ELEMENTWISE_CONVERT_FROM_CASES(f8e4m3fn)
-    ELEMENTWISE_CONVERT_FROM_CASES(f6e3m2fn)
-    ELEMENTWISE_CONVERT_FROM_CASES(f6e2m3fn)
-    ELEMENTWISE_CONVERT_FROM_CASES(f4e2m1fn)
-#undef ELEMENTWISE_CONVERT_FROM_CASES
-    {
-      std::string BuiltinName = getContext().BuiltinInfo.getName(BuiltinID);
-      StringRef Suffix = BuiltinName;
-      if (!Suffix.consume_front("__builtin_elementwise_convert_from_"))
-        llvm_unreachable("unexpected builtin");
-
-      StringRef SrcSuffix = Suffix.rsplit('_').first;
-      StringRef FormatName;
-      if (SrcSuffix == "f8e5m2")
-        FormatName = "Float8E5M2";
-      else if (SrcSuffix == "f8e4m3fn")
-        FormatName = "Float8E4M3FN";
-      else if (SrcSuffix == "f6e3m2fn")
-        FormatName = "Float6E3M2FN";
-      else if (SrcSuffix == "f6e2m3fn")
-        FormatName = "Float6E2M3FN";
-      else if (SrcSuffix == "f4e2m1fn")
-        FormatName = "Float4E2M1FN";
-      else
-        llvm_unreachable("unknown source format");
-
-      Value *Src = EmitScalarExpr(E->getArg(0));
-      llvm::Type *DstTy = ConvertType(E->getType());
-      llvm::Function *F = CGM.getIntrinsic(
-          llvm::Intrinsic::convert_from_arbitrary_fp, {DstTy, Src->getType()});
-      llvm::Value *Format = llvm::MetadataAsValue::get(
-          getLLVMContext(), llvm::MDString::get(getLLVMContext(), FormatName));
-      return RValue::get(Builder.CreateCall(F, {Src, Format}));
-    }
-
   case Builtin::BI__builtin_elementwise_abs: {
     Value *Result;
     QualType QT = E->getArg(0)->getType();

@@ -11507,14 +11507,22 @@ def err_arbitrary_fp_int_width : Error<
 def err_arbitrary_fp_sizeless_vector : Error<
   "%0 argument to %1 has sizeless vector type; only fixed-length vectors are "
   "supported">;
+def err_arbitrary_fp_unsupported_vector_type : Error<
+  "%0 argument to %1 has unsupported vector type %2; only GNU and extended "
+  "fixed-length vectors are supported">;
+def err_arbitrary_fp_non_fp_type : Error<
+  "%0 argument to %1 must be a floating-point type or a vector of "
+  "floating-point types">;
 def err_arbitrary_fp_non_int_type : Error<
   "%0 argument to %1 must be an integer type or a vector of integer types">;
 def err_arbitrary_fp_invalid_int_type : Error<
   "%0 argument to %1 must be a non-Boolean, non-enumeration integer type or "
   "a vector of such types">;
-def err_arbitrary_fp_unsupported_vector_type : Error<
-  "%0 argument to %1 has unsupported vector type %2; only GNU and extended "
-  "fixed-length vectors are supported">;
+def err_arbitrary_fp_unsupported_dst_type : Error<
+  "destination type %0 is not supported by %1">;
+def err_arbitrary_fp_incompatible_vector : Error<
+  "floating-point and integer arguments to %0 must have the same number of "
+  "elements">;
 
 def err_first_argument_to_cwsc_not_call : Error<
   "first argument to __builtin_call_with_static_chain must be a non-member call expression">;

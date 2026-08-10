@@ -172,7 +172,7 @@ features cannot lower the translation-unit ABI level;
 
 - Clang now allows GNU computed `goto` extension in `constexpr` functions, matching the relaxed
   `constexpr` function body rules introduced in C++23.
-- Added the `__builtin_elementwise_convert_from_*` family, which converts integers containing supported FP8, FP6, or FP4 encodings to `_Float16`, `__bf16`, `float`, or `double`.
+- Added the `__builtin_elementwise_convert_from_*` family, which converts an integer holding the bits of a narrow FP8, FP6, or FP4 encoding to a native floating-point type given as a type argument.
 
 ### New Compiler Flags
 

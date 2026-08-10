@@ -1,31 +1,45 @@
-// RUN: %clang_cc1 -triple spir-unknown-unknown -x cl \
-// RUN:   -finclude-default-header -fsyntax-only -verify %s
-// expected-no-diagnostics
+// RUN: %clang_cc1 -triple spir-unknown-unknown -cl-std=CL3.0 \
+// RUN:   -cl-ext=+cl_khr_fp16 -fsyntax-only -verify %s
+// RUN: %clang_cc1 -triple spir-unknown-unknown -cl-std=CL3.0 \
+// RUN:   -cl-ext=+cl_khr_fp16,-__opencl_c_fp64,-cl_khr_fp64 -DNO_FP64 \
+// RUN:   -fsyntax-only -verify %s
 
-#if !__has_builtin(__builtin_elementwise_convert_from_f8e5m2_f32)
+#pragma OPENCL EXTENSION cl_khr_fp16 : enable
+
+typedef unsigned char uchar4 __attribute__((ext_vector_type(4)));
+typedef float float4 __attribute__((ext_vector_type(4)));
+typedef half half4 __attribute__((ext_vector_type(4)));
+
+#if !__has_builtin(__builtin_elementwise_convert_from_f8e5m2)
 #error "missing elementwise arbitrary FP conversion builtin"
 #endif
 
-#if __has_builtin(__builtin_elementwise_convert_from_f8e5m3fnu_f32)
-#error "deferred arbitrary FP conversion builtin is unexpectedly available"
-#endif
-
-float convert_scalar(uchar src) {
-  return __builtin_elementwise_convert_from_f8e5m2_f32(src);
+float convert_scalar(unsigned char src) {
+  return __builtin_elementwise_convert_from_f8e5m2(src, float);
 }
 
-_Float16 convert_f16(uchar src) {
-  return __builtin_elementwise_convert_from_f8e5m2_f16(src);
+// A destination type argument lets OpenCL name half directly.
+half convert_half(unsigned char src) {
+  return __builtin_elementwise_convert_from_f8e5m2(src, half);
 }
 
-__bf16 convert_bf16(uchar src) {
-  return __builtin_elementwise_convert_from_f8e5m2_bf16(src);
-}
-
-double convert_f64(uchar src) {
-  return __builtin_elementwise_convert_from_f8e5m2_f64(src);
+half4 convert_half_vector(uchar4 src) {
+  return __builtin_elementwise_convert_from_f8e5m2(src, half4);
 }
 
 float4 convert_vector(uchar4 src) {
-  return __builtin_elementwise_convert_from_f8e5m2_f32(src);
+  return __builtin_elementwise_convert_from_f8e5m2(src, float4);
 }
+
+// The destination goes through the ordinary type rules, so an unavailable type
+// is rejected the same way it would be anywhere else.
+#ifdef NO_FP64
+void convert_double(unsigned char src) {
+  (void)__builtin_elementwise_convert_from_f8e5m2(src, double); // expected-error {{use of type 'double' requires cl_khr_fp64 and __opencl_c_fp64 support}}
+}
+#else
+// expected-no-diagnostics
+double convert_double(unsigned char src) {
+  return __builtin_elementwise_convert_from_f8e5m2(src, double);
+}
+#endif

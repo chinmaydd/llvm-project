@@ -4842,6 +4842,81 @@ public:
   }
 };
 
+/// ConvertFromArbitraryFPExpr - Clang builtin functions
+/// __builtin_elementwise_convert_from_<format>. This AST node provides support
+/// for interpreting an integer as the bits of the narrow floating-point format
+/// named by the builtin and converting it to the destination floating-point
+/// type.
+class ConvertFromArbitraryFPExpr : public Expr {
+public:
+  /// The narrow floating-point encodings that can be converted from.
+  enum ArbitraryFPFormat {
+#define ARBITRARY_FP_FORMAT(Suffix, LLVMName) AFPF_##Suffix,
+#include "clang/Basic/ArbitraryFPFormats.def"
+  };
+
+private:
+  Stmt *SrcExpr;
+  TypeSourceInfo *TInfo;
+  SourceLocation BuiltinLoc, RParenLoc;
+  ArbitraryFPFormat Format;
+
+  friend class ASTStmtReader;
+
+public:
+  ConvertFromArbitraryFPExpr(Expr *SrcExpr, ArbitraryFPFormat Format,
+                             TypeSourceInfo *TI, QualType DstType,
+                             ExprValueKind VK, ExprObjectKind OK,
+                             SourceLocation BuiltinLoc,
+                             SourceLocation RParenLoc)
+      : Expr(ConvertFromArbitraryFPExprClass, DstType, VK, OK),
+        SrcExpr(SrcExpr), TInfo(TI), BuiltinLoc(BuiltinLoc),
+        RParenLoc(RParenLoc), Format(Format) {
+    setDependence(computeDependence(this));
+  }
+
+  explicit ConvertFromArbitraryFPExpr(EmptyShell Empty)
+      : Expr(ConvertFromArbitraryFPExprClass, Empty) {}
+
+  /// getSrcExpr - Return the integer expression holding the format bits.
+  Expr *getSrcExpr() const { return cast<Expr>(SrcExpr); }
+
+  /// getFormat - Return the source narrow floating-point encoding.
+  ArbitraryFPFormat getFormat() const { return Format; }
+
+  /// getFormatName - Return the interpretation string that names \p Format in
+  /// the llvm.convert.from.arbitrary.fp intrinsic.
+  static StringRef getFormatName(ArbitraryFPFormat Format);
+  StringRef getFormatName() const { return getFormatName(Format); }
+
+  /// getBuiltinName - Return the spelling of the builtin selecting \p Format.
+  static StringRef getBuiltinName(ArbitraryFPFormat Format);
+  StringRef getBuiltinName() const { return getBuiltinName(Format); }
+
+  /// getTypeSourceInfo - Return the destination type.
+  TypeSourceInfo *getTypeSourceInfo() const { return TInfo; }
+  void setTypeSourceInfo(TypeSourceInfo *TI) { TInfo = TI; }
+
+  /// getBuiltinLoc - Return the location of the builtin token.
+  SourceLocation getBuiltinLoc() const { return BuiltinLoc; }
+
+  /// getRParenLoc - Return the location of final right parenthesis.
+  SourceLocation getRParenLoc() const { return RParenLoc; }
+
+  SourceLocation getBeginLoc() const LLVM_READONLY { return BuiltinLoc; }
+  SourceLocation getEndLoc() const LLVM_READONLY { return RParenLoc; }
+
+  static bool classof(const Stmt *T) {
+    return T->getStmtClass() == ConvertFromArbitraryFPExprClass;
+  }
+
+  // Iterators
+  child_range children() { return child_range(&SrcExpr, &SrcExpr + 1); }
+  const_child_range children() const {
+    return const_child_range(&SrcExpr, &SrcExpr + 1);
+  }
+};
+
 /// ChooseExpr - GNU builtin-in function __builtin_choose_expr.
 /// This AST node is similar to the conditional operator (?:) in C, with
 /// the following exceptions:

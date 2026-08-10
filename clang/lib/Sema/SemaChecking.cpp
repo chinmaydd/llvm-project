@@ -3044,98 +3044,6 @@ static QualType getVectorElementType(ASTContext &Context, QualType VecTy) {
   return QualType();
 }
 
-static bool BuiltinElementwiseConvertFromArbitraryFP(Sema &S, CallExpr *TheCall,
-                                                     unsigned BuiltinID) {
-  if (S.checkArgCount(TheCall, 1))
-    return true;
-
-  std::string BuiltinName = S.Context.BuiltinInfo.getName(BuiltinID);
-  StringRef Suffix = BuiltinName;
-  if (!Suffix.consume_front("__builtin_elementwise_convert_from_"))
-    llvm_unreachable("unexpected builtin");
-
-  auto [SrcSuffix, DstSuffix] = Suffix.rsplit('_');
-  StringRef FormatName = llvm::StringSwitch<StringRef>(SrcSuffix)
-                             .Case("f8e5m2", "Float8E5M2")
-                             .Case("f8e4m3fn", "Float8E4M3FN")
-                             .Case("f6e3m2fn", "Float6E3M2FN")
-                             .Case("f6e2m3fn", "Float6E2M3FN")
-                             .Case("f4e2m1fn", "Float4E2M1FN")
-                             .Default("");
-  if (FormatName.empty())
-    llvm_unreachable("unknown source format");
-
-  QualType DstEltTy;
-  if (DstSuffix == "f16")
-    DstEltTy = S.Context.Float16Ty;
-  else if (DstSuffix == "bf16")
-    DstEltTy = S.Context.BFloat16Ty;
-  else if (DstSuffix == "f32")
-    DstEltTy = S.Context.FloatTy;
-  else if (DstSuffix == "f64")
-    DstEltTy = S.Context.DoubleTy;
-  else
-    llvm_unreachable("unknown destination type");
-
-  if (S.checkFloatingPointTypeSupport(DstEltTy, TheCall->getBeginLoc(),
-                                      /*DiagnoseTarget=*/true))
-    return true;
-
-  ExprResult ConvertedSrc = S.DefaultLvalueConversion(TheCall->getArg(0));
-  if (ConvertedSrc.isInvalid())
-    return true;
-  TheCall->setArg(0, ConvertedSrc.get());
-
-  QualType SrcTy = ConvertedSrc.get()->getType();
-  if (SrcTy->isDependentType()) {
-    TheCall->setType(S.Context.DependentTy);
-    return false;
-  }
-
-  if (SrcTy->isSizelessVectorType())
-    return S.Diag(TheCall->getBeginLoc(),
-                  diag::err_arbitrary_fp_sizeless_vector)
-           << "first" << BuiltinName;
-
-  QualType SrcEltTy = SrcTy;
-  const auto *SrcVecTy = SrcTy->getAs<VectorType>();
-  if (SrcVecTy)
-    SrcEltTy = SrcVecTy->getElementType();
-
-  if (SrcVecTy && !SrcTy->isExtVectorType() &&
-      SrcVecTy->getVectorKind() != VectorKind::Generic)
-    return S.Diag(TheCall->getBeginLoc(),
-                  diag::err_arbitrary_fp_unsupported_vector_type)
-           << "first" << BuiltinName << SrcTy;
-
-  if (!SrcEltTy->isIntegerType())
-    return S.Diag(TheCall->getBeginLoc(), diag::err_arbitrary_fp_non_int_type)
-           << "first" << BuiltinName;
-
-  if (SrcEltTy->isBooleanType() || SrcEltTy->isEnumeralType())
-    return S.Diag(TheCall->getBeginLoc(),
-                  diag::err_arbitrary_fp_invalid_int_type)
-           << "first" << BuiltinName;
-
-  unsigned FormatBits =
-      llvm::APFloatBase::getArbitraryFPFormatSizeInBits(FormatName);
-  if (S.Context.getIntWidth(SrcEltTy) != FormatBits)
-    return S.Diag(ConvertedSrc.get()->getBeginLoc(),
-                  diag::err_arbitrary_fp_int_width)
-           << (SrcVecTy != nullptr) << SrcEltTy << FormatBits << FormatName
-           << ConvertedSrc.get()->getSourceRange();
-
-  QualType DstTy = DstEltTy;
-  if (SrcVecTy)
-    DstTy =
-        SrcTy->isExtVectorType()
-            ? S.Context.getExtVectorType(DstEltTy, SrcVecTy->getNumElements())
-            : S.Context.getVectorType(DstEltTy, SrcVecTy->getNumElements(),
-                                      VectorKind::Generic);
-  TheCall->setType(DstTy);
-  return false;
-}
-
 ExprResult
 Sema::CheckBuiltinFunctionCall(FunctionDecl *FDecl, unsigned BuiltinID,
                                CallExpr *TheCall) {
@@ -3850,21 +3758,6 @@ Sema::CheckBuiltinFunctionCall(FunctionDecl *FDecl, unsigned BuiltinID,
   case Builtin::BI__builtin_elementwise_abs:
     if (PrepareBuiltinElementwiseMathOneArgCall(
             TheCall, EltwiseBuiltinArgTyRestriction::SignedIntOrFloatTy))
-      return ExprError();
-    break;
-
-#define ELEMENTWISE_CONVERT_FROM_CASES(Src)                                    \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_f16:              \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_bf16:             \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_f32:              \
-  case Builtin::BI__builtin_elementwise_convert_from_##Src##_f64:
-    ELEMENTWISE_CONVERT_FROM_CASES(f8e5m2)
-    ELEMENTWISE_CONVERT_FROM_CASES(f8e4m3fn)
-    ELEMENTWISE_CONVERT_FROM_CASES(f6e3m2fn)
-    ELEMENTWISE_CONVERT_FROM_CASES(f6e2m3fn)
-    ELEMENTWISE_CONVERT_FROM_CASES(f4e2m1fn)
-#undef ELEMENTWISE_CONVERT_FROM_CASES
-    if (BuiltinElementwiseConvertFromArbitraryFP(*this, TheCall, BuiltinID))
       return ExprError();
     break;
 
@@ -6767,6 +6660,123 @@ ExprResult Sema::ConvertVectorExpr(Expr *E, TypeSourceInfo *TInfo,
 
   return ConvertVectorExpr::Create(Context, E, TInfo, DstTy, VK, OK, BuiltinLoc,
                                    RParenLoc, CurFPFeatureOverrides());
+}
+
+/// Check that \p Ty is a supported operand or result shape, that is a scalar
+/// or a GNU or extended fixed-length vector. Returns true after diagnosing.
+static bool checkArbitraryFPShape(Sema &S, QualType Ty, StringRef ArgName,
+                                  StringRef BuiltinName,
+                                  SourceLocation BuiltinLoc) {
+  if (Ty->isSizelessVectorType())
+    return S.Diag(BuiltinLoc, diag::err_arbitrary_fp_sizeless_vector)
+           << ArgName << BuiltinName;
+
+  const auto *VecTy = Ty->getAs<VectorType>();
+  if (VecTy && !Ty->isExtVectorType() &&
+      VecTy->getVectorKind() != VectorKind::Generic)
+    return S.Diag(BuiltinLoc, diag::err_arbitrary_fp_unsupported_vector_type)
+           << ArgName << BuiltinName << Ty;
+
+  return false;
+}
+
+ExprResult Sema::ConvertFromArbitraryFPExpr(
+    Expr *E, ConvertFromArbitraryFPExpr::ArbitraryFPFormat Fmt,
+    TypeSourceInfo *TInfo, SourceLocation BuiltinLoc,
+    SourceLocation RParenLoc) {
+  StringRef BuiltinName = ConvertFromArbitraryFPExpr::getBuiltinName(Fmt);
+  StringRef FormatName = ConvertFromArbitraryFPExpr::getFormatName(Fmt);
+
+  ExprResult ConvertedSrc = DefaultLvalueConversion(E);
+  if (ConvertedSrc.isInvalid())
+    return ExprError();
+  E = ConvertedSrc.get();
+
+  QualType DstTy = TInfo->getType();
+  QualType SrcTy = E->getType();
+
+  if (!SrcTy->isDependentType()) {
+    if (checkArbitraryFPShape(*this, SrcTy, "first", BuiltinName, BuiltinLoc))
+      return ExprError();
+
+    QualType SrcEltTy = SrcTy;
+    const auto *SrcVecTy = SrcTy->getAs<VectorType>();
+    if (SrcVecTy)
+      SrcEltTy = SrcVecTy->getElementType();
+
+    if (!SrcEltTy->isIntegerType())
+      return ExprError(Diag(BuiltinLoc, diag::err_arbitrary_fp_non_int_type)
+                       << "first" << BuiltinName);
+
+    // The integer is a bit container, so a type whose values are not plain
+    // bit patterns would be misleading here.
+    if (SrcEltTy->isBooleanType() || SrcEltTy->isEnumeralType())
+      return ExprError(Diag(BuiltinLoc, diag::err_arbitrary_fp_invalid_int_type)
+                       << "first" << BuiltinName);
+
+    unsigned FormatBits =
+        llvm::APFloatBase::getArbitraryFPFormatSizeInBits(FormatName);
+    if (Context.getIntWidth(SrcEltTy) != FormatBits)
+      return ExprError(Diag(E->getBeginLoc(), diag::err_arbitrary_fp_int_width)
+                       << (SrcVecTy != nullptr) << SrcEltTy << FormatBits
+                       << FormatName << E->getSourceRange());
+  }
+
+  if (!DstTy->isDependentType()) {
+    if (checkArbitraryFPShape(*this, DstTy, "second", BuiltinName, BuiltinLoc))
+      return ExprError();
+
+    QualType DstEltTy = DstTy;
+    if (const auto *DstVecTy = DstTy->getAs<VectorType>())
+      DstEltTy = DstVecTy->getElementType();
+
+    if (!DstEltTy->isRealFloatingType() && !DstEltTy->isMFloat8Type())
+      return ExprError(Diag(BuiltinLoc, diag::err_arbitrary_fp_non_fp_type)
+                       << "second" << BuiltinName);
+
+    // Restrict the destination by its semantics rather than by spelling, so
+    // that any type the intrinsic can widen to is accepted.
+    bool IsSupportedDstTy;
+    if (DstEltTy->isMFloat8Type()) {
+      IsSupportedDstTy = false;
+    } else if (DstEltTy->isBFloat16Type()) {
+      // __bf16 always denotes the bfloat16 format, but targets that do not
+      // support it leave getBFloat16Format() unpopulated. Such a use has
+      // already been diagnosed when the type was formed.
+      IsSupportedDstTy = true;
+    } else {
+      const llvm::fltSemantics &DstSem =
+          Context.getFloatTypeSemantics(DstEltTy);
+      IsSupportedDstTy = &DstSem == &llvm::APFloat::IEEEhalf() ||
+                         &DstSem == &llvm::APFloat::BFloat() ||
+                         &DstSem == &llvm::APFloat::IEEEsingle() ||
+                         &DstSem == &llvm::APFloat::IEEEdouble();
+    }
+
+    if (!IsSupportedDstTy)
+      return ExprError(
+          Diag(BuiltinLoc, diag::err_arbitrary_fp_unsupported_dst_type)
+          << DstTy << BuiltinName);
+  }
+
+  if (!SrcTy->isDependentType() && !DstTy->isDependentType()) {
+    const auto *SrcVecTy = SrcTy->getAs<VectorType>();
+    const auto *DstVecTy = DstTy->getAs<VectorType>();
+    if (DstVecTy && !SrcVecTy)
+      return ExprError(Diag(BuiltinLoc, diag::err_builtin_non_vector_type)
+                       << "first" << BuiltinName);
+    if (SrcVecTy && !DstVecTy)
+      return ExprError(Diag(BuiltinLoc, diag::err_builtin_non_vector_type)
+                       << "second" << BuiltinName);
+    if (SrcVecTy && DstVecTy &&
+        SrcVecTy->getNumElements() != DstVecTy->getNumElements())
+      return ExprError(
+          Diag(BuiltinLoc, diag::err_arbitrary_fp_incompatible_vector)
+          << BuiltinName);
+  }
+
+  return new (Context) clang::ConvertFromArbitraryFPExpr(
+      E, Fmt, TInfo, DstTy, VK_PRValue, OK_Ordinary, BuiltinLoc, RParenLoc);
 }
 
 bool Sema::BuiltinPrefetch(CallExpr *TheCall) {

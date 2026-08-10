@@ -1481,27 +1481,24 @@ def ConvertVector : Builtin {
   let Prototype = "void(...)";
 }
 
-// Source and destination suffixes are decoded in SemaChecking.cpp and
-// CGBuiltin.cpp.
-multiclass ElementwiseConvertFromArbitraryFP<string Src> {
-  foreach Dst = ["f16", "bf16", "f32", "f64"] in {
-    def _#Dst : Builtin {
-      let Spellings = ["__builtin_elementwise_convert_from_" # Src # "_" # Dst];
-      let Attributes = [NoThrow, Const, CustomTypeChecking];
-      let Prototype = "void(...)";
-    }
-  }
+// These are parsed as keywords because the destination is a type argument.
+// The entries here exist so that __has_builtin can query each source encoding.
+// The encodings are listed in clang/Basic/ArbitraryFPFormats.def.
+class ElementwiseConvertFromArbitraryFP<string suffix> : Builtin {
+  let Spellings = ["__builtin_elementwise_convert_from_" # suffix];
+  let Attributes = [NoThrow, Const, CustomTypeChecking];
+  let Prototype = "void(...)";
 }
 
-defm ElementwiseConvertFromF8E5M2
+def ElementwiseConvertFromF8E5M2
     : ElementwiseConvertFromArbitraryFP<"f8e5m2">;
-defm ElementwiseConvertFromF8E4M3FN
+def ElementwiseConvertFromF8E4M3FN
     : ElementwiseConvertFromArbitraryFP<"f8e4m3fn">;
-defm ElementwiseConvertFromF6E3M2FN
+def ElementwiseConvertFromF6E3M2FN
     : ElementwiseConvertFromArbitraryFP<"f6e3m2fn">;
-defm ElementwiseConvertFromF6E2M3FN
+def ElementwiseConvertFromF6E2M3FN
     : ElementwiseConvertFromArbitraryFP<"f6e2m3fn">;
-defm ElementwiseConvertFromF4E2M1FN
+def ElementwiseConvertFromF4E2M1FN
     : ElementwiseConvertFromArbitraryFP<"f4e2m1fn">;
 
 def MaskedLoad : Builtin {

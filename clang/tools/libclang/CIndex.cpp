@@ -2114,6 +2114,7 @@ public:
   void VisitDeclStmt(const DeclStmt *S);
   void VisitDependentScopeDeclRefExpr(const DependentScopeDeclRefExpr *E);
   void VisitDesignatedInitExpr(const DesignatedInitExpr *E);
+  void VisitConvertFromArbitraryFPExpr(const ConvertFromArbitraryFPExpr *E);
   void VisitExplicitCastExpr(const ExplicitCastExpr *E);
   void VisitForStmt(const ForStmt *FS);
   void VisitGotoStmt(const GotoStmt *GS);
@@ -3161,6 +3162,11 @@ void EnqueueVisitor::VisitDesignatedInitExpr(const DesignatedInitExpr *E) {
     AddStmt(E->getArrayRangeEnd(D));
     AddStmt(E->getArrayRangeStart(D));
   }
+}
+void EnqueueVisitor::VisitConvertFromArbitraryFPExpr(
+    const ConvertFromArbitraryFPExpr *E) {
+  EnqueueChildren(E);
+  AddTypeLoc(E->getTypeSourceInfo());
 }
 void EnqueueVisitor::VisitExplicitCastExpr(const ExplicitCastExpr *E) {
   EnqueueChildren(E);

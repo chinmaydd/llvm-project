@@ -5973,6 +5973,16 @@ recurse:
     Out << "v18co_yield";
     mangleExpression(cast<CoawaitExpr>(E)->getOperand());
     break;
+
+  case Expr::ConvertFromArbitraryFPExprClass: {
+    const auto *CE = cast<ConvertFromArbitraryFPExpr>(E);
+    NotPrimaryExpr();
+    mangleVendorType(CE->getBuiltinName());
+    mangleTemplateArgExpr(CE->getSrcExpr());
+    mangleType(CE->getTypeSourceInfo()->getType());
+    Out << 'E';
+    break;
+  }
   case Expr::SYCLUniqueStableNameExprClass: {
     const auto *USN = cast<SYCLUniqueStableNameExpr>(E);
     NotPrimaryExpr();
