@@ -11,7 +11,8 @@
 // llvm.convert.from.arbitrary.fp interpretation string.
 //
 // Each entry needs a matching instantiation in Builtins.td: expansions name
-// builtin IDs directly, so a stale entry fails to compile.
+// builtin IDs directly, so a stale entry fails to compile. An entry must also
+// be accepted by APFloat::getArbitraryFPSemantics, or lowering fails.
 //
 // The sub-byte encodings (Float6E3M2FN, Float6E2M3FN, Float4E2M1FN) lower but
 // are not exposed; Clang cannot spell their vector element types coherently.
@@ -24,5 +25,6 @@
 
 ARBITRARY_FP_FORMAT(f8e5m2, "Float8E5M2")
 ARBITRARY_FP_FORMAT(f8e4m3fn, "Float8E4M3FN")
+ARBITRARY_FP_FORMAT(f8e5m3fnu, "Float8E5M3FNU")
 
 #undef ARBITRARY_FP_FORMAT

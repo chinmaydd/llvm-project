@@ -1496,6 +1496,8 @@ defm ElementwiseConvertFromF8E5M2
     : ElementwiseConvertFromArbitraryFP<"f8e5m2">;
 defm ElementwiseConvertFromF8E4M3FN
     : ElementwiseConvertFromArbitraryFP<"f8e4m3fn">;
+defm ElementwiseConvertFromF8E5M3FNU
+    : ElementwiseConvertFromArbitraryFP<"f8e5m3fnu">;
 
 def MaskedLoad : Builtin {
   let Spellings = ["__builtin_masked_load"];

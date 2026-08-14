@@ -3654,6 +3654,7 @@ The source format suffix determines the interpretation and required integer elem
 | ------------ | -------------- | ----- |
 | `f8e5m2`     | `Float8E5M2`   | 8     |
 | `f8e4m3fn`   | `Float8E4M3FN` | 8     |
+| `f8e5m3fnu`  | `Float8E5M3FNU`| 8     |
 
 The destination suffix determines the result element type:
 
@@ -3664,8 +3665,13 @@ The destination suffix determines the result element type:
 | `f32`  | `float`             |
 
 The `f16` suffix denotes `_Float16` in every language mode, including OpenCL.
-The two source suffixes and three destination suffixes form exactly six
+The three source suffixes and three destination suffixes form exactly nine
 builtin spellings.
+
+`Float8E5M3FNU` has no sign bit and no infinity encoding, and its exponent
+range exceeds that of `_Float16`. Its seven largest finite encodings therefore
+convert to infinity rather than exactly when the destination is `f16`; the
+`bf16` and `f32` destinations are exact.
 
 Only the signedness-free width of `bits` matters, so for an 8-bit format any 8-bit `char`, `signed char`, `unsigned char`, or `_BitInt(8)` of either signedness may be used.
 On targets that have it, `__mfp8` is also accepted as a scalar source, because

@@ -6,7 +6,7 @@
 #error "missing elementwise arbitrary FP conversion builtin"
 #endif
 
-#if __has_builtin(__builtin_elementwise_convert_from_f8e5m3fnu_f32)
+#if __has_builtin(__builtin_elementwise_convert_from_f6e3m2fn_f32)
 #error "deferred arbitrary FP conversion builtin is unexpectedly available"
 #endif
 

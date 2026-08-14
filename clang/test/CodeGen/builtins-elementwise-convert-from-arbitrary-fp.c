@@ -85,6 +85,32 @@ __bf16 from_f8e4m3fn_to_bf16(unsigned char b) {
   return __builtin_elementwise_convert_from_f8e4m3fn_bf16(b);
 }
 
+// CHECK-LABEL: define dso_local float @from_f8e5m3fnu_to_f32(
+// CHECK-SAME: i8 noundef zeroext [[B:%.*]]) #[[ATTR0]] {
+// CHECK-NEXT:  [[ENTRY:.*:]]
+// CHECK-NEXT:    [[B_ADDR:%.*]] = alloca i8, align 1
+// CHECK-NEXT:    store i8 [[B]], ptr [[B_ADDR]], align 1
+// CHECK-NEXT:    [[TMP0:%.*]] = load i8, ptr [[B_ADDR]], align 1
+// CHECK-NEXT:    [[TMP1:%.*]] = call float @llvm.convert.from.arbitrary.fp.f32.i8(i8 [[TMP0]], metadata !"Float8E5M3FNU")
+// CHECK-NEXT:    ret float [[TMP1]]
+//
+float from_f8e5m3fnu_to_f32(unsigned char b) {
+  return __builtin_elementwise_convert_from_f8e5m3fnu_f32(b);
+}
+
+// CHECK-LABEL: define dso_local half @from_f8e5m3fnu_to_f16(
+// CHECK-SAME: i8 noundef zeroext [[B:%.*]]) #[[ATTR0]] {
+// CHECK-NEXT:  [[ENTRY:.*:]]
+// CHECK-NEXT:    [[B_ADDR:%.*]] = alloca i8, align 1
+// CHECK-NEXT:    store i8 [[B]], ptr [[B_ADDR]], align 1
+// CHECK-NEXT:    [[TMP0:%.*]] = load i8, ptr [[B_ADDR]], align 1
+// CHECK-NEXT:    [[TMP1:%.*]] = call half @llvm.convert.from.arbitrary.fp.f16.i8(i8 [[TMP0]], metadata !"Float8E5M3FNU")
+// CHECK-NEXT:    ret half [[TMP1]]
+//
+_Float16 from_f8e5m3fnu_to_f16(unsigned char b) {
+  return __builtin_elementwise_convert_from_f8e5m3fnu_f16(b);
+}
+
 // CHECK-LABEL: define dso_local float @from_signed_f8e5m2(
 // CHECK-SAME: i8 noundef signext [[B:%.*]]) #[[ATTR0]] {
 // CHECK-NEXT:  [[ENTRY:.*:]]
