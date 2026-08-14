@@ -201,15 +201,6 @@ ExprDependence clang::computeDependence(ConvertVectorExpr *E) {
   return D;
 }
 
-ExprDependence clang::computeDependence(ConvertFromArbitraryFPExpr *E) {
-  auto D = toExprDependenceAsWritten(
-               E->getTypeSourceInfo()->getType()->getDependence()) |
-           E->getSrcExpr()->getDependence();
-  if (!E->getType()->isDependentType())
-    D &= ~ExprDependence::Type;
-  return D;
-}
-
 ExprDependence clang::computeDependence(ChooseExpr *E) {
   if (E->isConditionDependent())
     return ExprDependence::TypeValueInstantiation |

@@ -1659,13 +1659,6 @@ void StmtProfiler::VisitConvertVectorExpr(const ConvertVectorExpr *S) {
   VisitExpr(S);
 }
 
-void StmtProfiler::VisitConvertFromArbitraryFPExpr(
-    const ConvertFromArbitraryFPExpr *S) {
-  VisitExpr(S);
-  ID.AddInteger(S->getFormat());
-  VisitType(S->getTypeSourceInfo()->getType());
-}
-
 void StmtProfiler::VisitChooseExpr(const ChooseExpr *S) {
   VisitExpr(S);
 }

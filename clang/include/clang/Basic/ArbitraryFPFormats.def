@@ -6,24 +6,23 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file defines the narrow floating-point encodings that can be converted
-// from with the __builtin_elementwise_convert_from_<Suffix> builtins.
+// Source encodings exposed by the __builtin_elementwise_convert_from_* family.
+// Src is the source half of the builtin name suffix; LLVMName is the
+// llvm.convert.from.arbitrary.fp interpretation string.
 //
-// Suffix is the builtin name suffix and LLVMName is the interpretation string
-// understood by the llvm.convert.from.arbitrary.fp intrinsic. Only encodings
-// with target-independent lowering are listed, so that an accepted source
-// program cannot fail later during code generation.
+// Each entry needs a matching instantiation in Builtins.td: expansions name
+// builtin IDs directly, so a stale entry fails to compile.
+//
+// The sub-byte encodings (Float6E3M2FN, Float6E2M3FN, Float4E2M1FN) lower but
+// are not exposed; Clang cannot spell their vector element types coherently.
 //
 //===----------------------------------------------------------------------===//
 
 #ifndef ARBITRARY_FP_FORMAT
-#define ARBITRARY_FP_FORMAT(Suffix, LLVMName)
+#define ARBITRARY_FP_FORMAT(Src, LLVMName)
 #endif
 
 ARBITRARY_FP_FORMAT(f8e5m2, "Float8E5M2")
 ARBITRARY_FP_FORMAT(f8e4m3fn, "Float8E4M3FN")
-ARBITRARY_FP_FORMAT(f6e3m2fn, "Float6E3M2FN")
-ARBITRARY_FP_FORMAT(f6e2m3fn, "Float6E2M3FN")
-ARBITRARY_FP_FORMAT(f4e2m1fn, "Float4E2M1FN")
 
 #undef ARBITRARY_FP_FORMAT

@@ -3614,13 +3614,12 @@ Query for this feature with `__has_builtin(__builtin_convertvector)`.
 
 ### `__builtin_elementwise_convert_from_*`
 
-The `__builtin_elementwise_convert_from_*` family interprets an integer as the bits of a value in a narrow floating-point format that has no corresponding C type, and converts it to a native floating-point type.
-The builtin name selects the source encoding and the destination is given as a type argument.
+The `__builtin_elementwise_convert_from_*` family interprets an integer as the bits of a narrow floating-point format that has no corresponding C type and converts it to a native floating-point type.
 
 **Syntax**:
 
 ```c++
-__builtin_elementwise_convert_from_<format>(bits, dst_type)
+__builtin_elementwise_convert_from_<source_format>_<destination_type>(bits)
 ```
 
 **Examples**:
@@ -3632,47 +3631,75 @@ typedef float float4 __attribute__((ext_vector_type(4)));
 unsigned char b; uchar4 vb;
 
 // Interpret b as a Float8E4M3FN value and widen it to _Float16.
-__builtin_elementwise_convert_from_f8e4m3fn(b, _Float16)
+__builtin_elementwise_convert_from_f8e4m3fn_f16(b)
 
 // The same, elementwise, for four Float8E5M2 values.
-__builtin_elementwise_convert_from_f8e5m2(vb, float4)
+__builtin_elementwise_convert_from_f8e5m2_f32(vb)
 ```
 
 **Description**:
 
-The source encoding is part of the builtin name:
+`bits` is a non-Boolean, non-enumeration integer or a supported fixed-length vector of such integers holding the encoded floating-point value.
+The result is a scalar for a scalar input or a vector with the same number of elements for a vector input.
+Supported vector kinds are GNU `vector_size` and Clang/OpenCL `ext_vector_type`.
+The result preserves which of those two vector kinds the input uses.
+Sizeless vectors and target-specific fixed-length vector kinds are rejected.
+Preserving both the lane count and a target-specific vector kind after widening
+the element type can produce an invalid type or ABI combination, such as a
+widened NEON vector.
 
-| Builtin suffix | Source format  | Width |
-| -------------- | -------------- | ----- |
-| `f8e5m2`       | `Float8E5M2`   | 8     |
-| `f8e4m3fn`     | `Float8E4M3FN` | 8     |
-| `f6e3m2fn`     | `Float6E3M2FN` | 6     |
-| `f6e2m3fn`     | `Float6E2M3FN` | 6     |
-| `f4e2m1fn`     | `Float4E2M1FN` | 4     |
+The source format suffix determines the interpretation and required integer element width:
 
-`bits` is a non-Boolean, non-enumeration integer, or a vector of such integers, holding the encoded floating-point value.
-Its width, or its element width for vectors, must equal the width of the source format.
-Only the signedness-free width matters, so for an 8-bit format any of `char`, `signed char`, `unsigned char`, or `_BitInt(8)` of either signedness may be used.
-The 6-bit and 4-bit formats require a `_BitInt` of the matching width.
-Because Clang only permits `_BitInt` vector elements whose width is a power of two, vectors of the 6-bit formats cannot be expressed.
+| Suffix       | Source format  | Width |
+| ------------ | -------------- | ----- |
+| `f8e5m2`     | `Float8E5M2`   | 8     |
+| `f8e4m3fn`   | `Float8E4M3FN` | 8     |
 
-`dst_type` is the complete result type, as in `__builtin_convertvector`.
-A scalar `bits` requires a scalar destination and a vector `bits` requires a vector destination with the same number of elements.
-Accepted destination element semantics are IEEE half, bfloat16, IEEE single, and IEEE double, which includes `_Float16`, `__bf16`, `float`, `double`, and the OpenCL `half` type.
-Other destination types, including types with x87 extended, PPC double-double, or IEEE quad semantics and the `__mfp8` type, are rejected.
-Because the destination is written as an ordinary type, the usual language and target availability rules for that type apply.
+The destination suffix determines the result element type:
 
-Source and destination vectors must be GNU `vector_size` or Clang/OpenCL `ext_vector_type` fixed-length vectors.
-Sizeless vectors and target-specific vector kinds such as NEON, AltiVec, fixed-length SVE, and fixed-length RVV are rejected.
-The two kinds may be mixed, and the destination decides the result kind.
+| Suffix | Result element type |
+| ------ | ------------------- |
+| `f16`  | `_Float16`          |
+| `bf16` | `__bf16`            |
+| `f32`  | `float`             |
 
-These builtins map to the `llvm.convert.from.arbitrary.fp` intrinsic; see its description in the LLVM Language Reference for the exact conversion semantics.
-Every source bit pattern produces a defined result, and all supported combinations are exact widening conversions for finite values.
+The `f16` suffix denotes `_Float16` in every language mode, including OpenCL.
+The two source suffixes and three destination suffixes form exactly six
+builtin spellings.
 
-These builtins are not supported in constant expressions, so `__has_constexpr_builtin` returns zero for them.
+Only the signedness-free width of `bits` matters, so for an 8-bit format any 8-bit `char`, `signed char`, `unsigned char`, or `_BitInt(8)` of either signedness may be used.
+On targets that have it, `__mfp8` is also accepted as a scalar source, because
+it is an opaque 8-bit floating-point container with no interpretation of its
+own. Its Neon vector types are rejected with the other target-specific vector
+kinds.
 
-Query for an individual source encoding with, for example, `__has_builtin(__builtin_elementwise_convert_from_f8e4m3fn)`.
-This reports recognition of the spelling and does not guarantee native instruction support or that a given destination type is available on the target.
+Integer promotions and the usual arithmetic conversions are not applied to
+`bits`, so an expression that C promotes to `int` needs an explicit cast back
+to an 8-bit container:
+
+```c
+unsigned char b;
+__builtin_elementwise_convert_from_f8e5m2_f32((unsigned char)(b >> 1));
+```
+
+These builtins are available in C, C++, and OpenCL, but are not supported in constant expressions.
+`__has_constexpr_builtin` therefore returns zero for these builtins.
+Each builtin maps to the `llvm.convert.from.arbitrary.fp` intrinsic; see its description in the LLVM Language Reference for the exact conversion semantics.
+NaN results follow LLVM's general NaN rules; the sign, quiet or signaling state,
+and payload are not guaranteed to be preserved.
+Current generic code generation for the intrinsic is SelectionDAG-only.
+Other code-generation paths are future work.
+
+Normal target and language availability rules apply to the result element type.
+
+**Builtin availability**:
+
+Use `__has_builtin`, for example
+`__has_builtin(__builtin_elementwise_convert_from_f8e4m3fn_f16)`, to test
+whether Clang supports that exact builtin spelling.
+This does not establish destination type availability, native instruction
+availability, or backend-lowering availability.
+Code using `_Float16` or `__bf16` must check type availability separately.
 
 ### `__builtin_bitreverse`
 

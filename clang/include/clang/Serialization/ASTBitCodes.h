@@ -1762,9 +1762,6 @@ enum StmtCode {
   /// A ConvertVectorExpr record.
   EXPR_CONVERT_VECTOR,
 
-  /// A ConvertFromArbitraryFPExpr record.
-  EXPR_CONVERT_FROM_ARBITRARY_FP,
-
   /// BlockExpr
   EXPR_BLOCK,
 

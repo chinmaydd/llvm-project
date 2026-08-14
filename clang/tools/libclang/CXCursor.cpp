@@ -337,7 +337,6 @@ CXCursor cxcursor::MakeCXCursor(const Stmt *S, const Decl *Parent,
   case Stmt::ShuffleVectorExprClass:
   case Stmt::SourceLocExprClass:
   case Stmt::ConvertVectorExprClass:
-  case Stmt::ConvertFromArbitraryFPExprClass:
   case Stmt::VAArgExprClass:
   case Stmt::ObjCArrayLiteralClass:
   case Stmt::ObjCDictionaryLiteralClass:

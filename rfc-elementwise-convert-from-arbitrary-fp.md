@@ -1,422 +1,199 @@
-# [RFC][Clang] Elementwise builtins for converting encoded FP8, FP6, and FP4 values
+# [RFC][Clang] Elementwise builtins for converting encoded FP8 values
 
-> Status: Draft for discussion.
-> Two prototypes exist: an earlier form taking a format string and a destination type
-> ([PR #212647](https://github.com/llvm/llvm-project/pull/212647)), and a later form encoding
-> both the source format and the destination in the builtin name.
-> This RFC proposes a third form that keeps the type argument and drops the string.
+Implemented and passing `check-clang`; two alternatives were also prototyped and are described below.
 
 ## Summary
 
-This RFC proposes target-independent Clang builtins for converting integer-encoded FP8, FP6, and FP4 values to native floating-point types.
-They lower to the existing `llvm.convert.from.arbitrary.fp` intrinsic, so no LLVM IR or backend change is required.
+Target-independent Clang spellings for converting integer-encoded FP8 values to native floating-point types. They lower to the existing `llvm.convert.from.arbitrary.fp`, so no IR change is proposed.
 
-The builtin name identifies the source encoding, and the destination is an ordinary type argument:
-
-```c
-__builtin_elementwise_convert_from_<source_format>(bits, destination_type)
-```
-
-For example:
+Each spelling names both the source encoding and the destination type, and takes one argument:
 
 ```c
-float value = __builtin_elementwise_convert_from_f8e4m3fn(encoded, float);
+__builtin_elementwise_convert_from_<source_format>_<destination_type>(bits)
 ```
 
-The first operand may be a scalar integer or a fixed-length integer vector.
-Vector conversion is elementwise, and the destination is written as the complete result type, as in `__builtin_convertvector`:
+The operand may be a scalar integer or a fixed-length integer vector. Conversion is elementwise and preserves the element count, so one spelling serves both:
 
 ```c
-typedef unsigned char uchar4 __attribute__((ext_vector_type(4)));
-typedef float float4 __attribute__((ext_vector_type(4)));
-
-unsigned char bits;
-uchar4 bits4;
-
-float scalar = __builtin_elementwise_convert_from_f8e4m3fn(bits, float);
-float4 packed = __builtin_elementwise_convert_from_f8e4m3fn(bits4, float4);
+float  scalar = __builtin_elementwise_convert_from_f8e5m2_f32(bits);
+float4 packed = __builtin_elementwise_convert_from_f8e5m2_f32(bits4);
 ```
 
-Five source formats give five builtins, one per encoding.
+Two source encodings (`f8e5m2`, `f8e4m3fn`) and three destinations (`f16` → `_Float16`, `bf16` → `__bf16`, `f32` → `float`) give six builtins. Because the destination is in the name, these stay ordinary `CallExpr`s: no keyword, parser production, expression node, serialization record, or mangling rule.
+
+## Prior review
+
+[PR #212647](https://github.com/llvm/llvm-project/pull/212647) proposed an earlier form taking a format string and a destination type. This RFC answers that feedback:
+
+* @shiltian and @MrSidims objected to selecting semantics with a string operand — the string is gone.
+* @arsenm asked for an enum or a type suffix, preferring the suffix so the exact spelling is `__has_builtin`-queryable, and noted it must include the return type. This is that form. He also asked for elementwise vector support, adopted here.
+* @MrSidims does not find suffix overloads ergonomic either, though he reported the equivalent SPIR-V builtins were straightforward to implement and use. Open question 1 puts this to the list.
+* @AaronBallman asked for an RFC covering constant expressions, language availability, and the motivating use case — all below.
+* @MrSidims asked about stochastic rounding, which the current intrinsics cannot express — see Future directions.
 
 ## Motivation
 
-Low-precision floating-point formats are commonly stored as integers because C and C++ do not provide portable arithmetic types for these encodings.
-Libraries must nevertheless convert these encodings to `_Float16`, `__bf16`, `float`, and `double`.
+Low-precision formats are commonly stored as integers, because C and C++ have no portable arithmetic types for these encodings. Libraries must still convert them to `_Float16`, `__bf16`, and `float`.
 
-HIP is the initial consumer.
-HIP FP8 headers currently use AMDGPU-specific scalar and packed builtins such as `__builtin_amdgcn_cvt_f32_fp8` and `__builtin_amdgcn_cvt_pk_f32_fp8`.
-
-The scalar builtin consumes an instruction-shaped 32-bit operand and a byte index, while two values require a different packed builtin:
+HIP is the initial consumer. Its FP8 headers use AMDGPU-specific builtins and must pick a scalar or packed instruction shape at the source level:
 
 ```c++
-typedef float float2 __attribute__((ext_vector_type(2)));
-
-static inline float convert_one(unsigned char bits) {
-  int word = bits;
-  return __builtin_amdgcn_cvt_f32_fp8(word, 0);
-}
-
-static inline float2 convert_two(unsigned short bits) {
-  int word = bits;
-  return __builtin_amdgcn_cvt_pk_f32_fp8(word, false);
-}
+__builtin_amdgcn_cvt_f32_fp8((int)bits, 0);        // instruction-shaped word + byte index
+__builtin_amdgcn_cvt_pk_f32_fp8((int)bits, false); // a different builtin for two values
 ```
 
-The header must therefore choose a scalar or packed instruction shape and maintain separate target-specific and software paths instead of expressing one elementwise conversion.
+So the header maintains separate target-specific and software paths instead of expressing one elementwise conversion. The proposed builtin expresses only the semantics and accepts a vector with the same spelling, leaving scalar-or-packed selection to the compiler. Packed selection is retained today: on gfx950, gfx1170, and gfx1250 the `<2 x i8>` and `<4 x i8>` FP8-to-f32 forms select one and two `v_cvt_pk_f32_fp8_e32` instructions respectively.
 
-The proposed builtin expresses only the semantic conversion and accepts an integer vector with the same spelling.
-A header can therefore use one operation for host and device compilation and leave scalar, packed, or generic lowering to the compiler.
-
-Leaving that choice to the compiler does not cost code quality on the initial consumer.
-On gfx950, gfx1170, and gfx1250, a `<2 x i8>` OCP FP8 conversion to `<2 x float>` selects a single `v_cvt_pk_f32_fp8_e32` and a `<4 x i8>` conversion selects two, which is what the packed target builtin produces today.
-`llvm/test/CodeGen/AMDGPU/arbitrary-fp-to-float-fp8-hw.ll` covers this.
-
-SYCL/SPIR-V, OpenCL, and portable low-precision C++ libraries could use the same semantic interface across targets.
-Target-specific builtins remain appropriate when a source API intentionally exposes byte selection or another ISA-specific operation.
+This does not claim SPIR-V support or universal cross-target codegen. Target-specific builtins remain appropriate where an API intentionally exposes byte selection or another ISA-specific operation.
 
 ## Existing LLVM support
-
-LLVM IR already provides:
 
 ```llvm
 declare <fNxM> @llvm.convert.from.arbitrary.fp.<fNxM>.<iNxM>(
     <iNxM> %value, metadata %interpretation)
 ```
 
-The integer operand contains the source floating-point encoding.
-The metadata operand identifies its interpretation.
-The intrinsic is overloaded on the source and destination types and supports scalar and vector forms.
+The integer holds the encoding; the metadata names its interpretation. Generic SelectionDAG expansion supports five source formats:
 
-LLVM also provides the inverse `llvm.convert.to.arbitrary.fp`, which additionally takes a rounding mode and a saturation flag.
-This RFC does not propose builtins for it, but its shape informs the naming discussion below.
+| Source suffix | Interpretation | Width | Proposal |
+| --- | --- | ---: | --- |
+| `f8e5m2` | `Float8E5M2` | 8 | Exposed |
+| `f8e4m3fn` | `Float8E4M3FN` | 8 | Exposed |
+| `f6e3m2fn` | `Float6E3M2FN` | 6 | Deferred |
+| `f6e2m3fn` | `Float6E2M3FN` | 6 | Deferred |
+| `f4e2m1fn` | `Float4E2M1FN` | 4 | Deferred |
 
-Target-independent SelectionDAG expansion currently supports these source formats:
+Lowering exists **only in SelectionDAG**. GlobalISel has none: `-global-isel` fails with `LLVM ERROR: unable to translate instruction` from `IRTranslator` rather than falling back. AMDGPU `clang -O0` still uses SelectionDAG, so this is off the default path, but it is a hard error, not a missing optimization.
 
-| Name suffix | LLVM interpretation | Required integer element width |
-| --- | --- | ---: |
-| `f8e5m2` | `Float8E5M2` | 8 |
-| `f8e4m3fn` | `Float8E4M3FN` | 8 |
-| `f6e3m2fn` | `Float6E3M2FN` | 6 |
-| `f6e2m3fn` | `Float6E2M3FN` | 6 |
-| `f4e2m1fn` | `Float4E2M1FN` | 4 |
+LLVM also has the inverse `llvm.convert.to.arbitrary.fp`, which additionally takes a rounding mode and a saturation flag. No builtin is proposed for it here, but its shape bears on the naming discussion.
 
-The initial Clang API is deliberately limited to this set.
-Verifier recognition or APFloat support alone is not sufficient, because an accepted source program must not fail later during generic code generation, where the diagnostic has no source location.
+## Prerequisites
 
-AMDGPU already custom-lowers the two OCP FP8 formats to f32 on targets with OCP FP8 conversion instructions and to f16 on targets with separate FP8-to-f16 support.
-That support was added by [PR #194144](https://github.com/llvm/llvm-project/pull/194144).
-Without those features, the same conversions use generic expansion, as do all other supported combinations.
-This backend status is informational and may change without changing the proposed source API.
+Two LLVM-side changes, proposed as separate patches:
+
+1. **AMDGPU f16 gating.** `SITargetLowering::LowerCONVERT_FROM_ARBITRARY_FP` routes an `f16` destination to `lowerFromFP8` unconditionally; it must be gated on `hasFP8F16ConversionInsts()` so other targets fall back to generic expansion. Required before `_f16` is usable across AMDGPU targets.
+2. **LangRef NaN clarification.** LangRef says the NaN representation is preserved (quiet stays quiet, signaling stays signaling). The generic expansion does not implement that, and this proposal's NaN wording assumes the weaker contract. Relaxing a documented guarantee deserves its own review.
 
 ## Scope
 
-The initial proposal does not:
+The initial proposal does not: change LLVM IR; expose the sub-byte encodings, other source formats, or an `f64` destination; add non-SelectionDAG codegen; convert native values to narrow encodings; define rounding controls; support scalable or target-specific vector kinds; or support constant evaluation.
 
-* add or change LLVM IR intrinsics,
-* expose formats without target-independent generic lowering,
-* convert native floating-point values to narrow encodings, which is a scoping choice rather than a missing LLVM capability,
-* define deterministic or stochastic rounding controls,
-* support scalable or target-specific vector kinds, or
-* support constant evaluation.
+## Naming
 
-## Proposed API
+The source precedes the destination, mirroring the intrinsic. `elementwise` is used in its established sense of accepting a scalar or fixed-length vector and applying per element; unlike the rest of that family this one is not type preserving, because the source encoding has no C type that could also be the result type. Suffix meanings are uniform in every language mode — `f16` is `_Float16`, not `__fp16` or the OpenCL `half`.
 
-### Naming and feature granularity
+Encoding both types in the name keeps these ordinary calls. A destination given as a *type* argument cannot be an ordinary call argument, so it forces a keyword, a parser production, and a dedicated expression node, pulling in dependence computation, printing, profiling, `TreeTransform`, `ASTImporter`, serialization, an Itanium mangling, and AST-consumer entries. Both forms were prototyped, so this is measured rather than asserted:
 
-The builtin spelling is:
+| | Non-test files | Non-test lines |
+| --- | ---: | ---: |
+| Destination as a type argument | 40, of which 19 are AST plumbing | ~890 |
+| Destination in the name (proposed) | 6 | ~240 |
 
-```c
-__builtin_elementwise_convert_from_<source_format>(bits, destination_type)
-```
+The mangling is the part that does not wash out: a new node needs an Itanium vendor-extension mangling that becomes ABI once shipped, embedding the LLVM-internal interpretation string in mangled names.
 
-The source encoding is in the name because it is not a C type and cannot be spelled any other way without inventing one.
-The destination is a type argument because it *is* a C type, and the type system can already answer every question about it.
+**The cost, plainly.** The multiplier is the number of destination types, applied to the widening half of the family. Today that is 2 × 3 = 6. If every recognized interpretation were eventually exposed with an `f64` destination it would be 10 × 4 = 40. A narrowing family costs one name per encoding under any scheme, since its source type is deduced and its rounding and saturation operands must be constant arguments regardless. Open question 1 asks whether the trade is right.
 
-The `elementwise` prefix is used in its established sense of an operation that accepts a scalar or a fixed-length vector and applies per element.
-Unlike the existing `__builtin_elementwise_*` builtins, this family is not type preserving, because the source encoding has no C type that could also be the result type.
-`__builtin_convertvector` is the existing precedent for a Clang builtin whose destination is supplied as a type argument.
+## Operand and result types
 
-This split gives one builtin per source encoding:
+One argument. The source element type must be an integer, not `_Bool`/`bool` or an enumeration, and exactly the width of the source suffix; wider containers are rejected even when their low bits hold the encoding. Signedness has no effect — the integer is a bit container, not a numerically converted value — so `char`, `signed char`, `unsigned char`, and `_BitInt(8)` all work where they are 8 bits.
 
-| Builtin |
-| --- |
-| `__builtin_elementwise_convert_from_f8e5m2` |
-| `__builtin_elementwise_convert_from_f8e4m3fn` |
-| `__builtin_elementwise_convert_from_f6e3m2fn` |
-| `__builtin_elementwise_convert_from_f6e2m3fn` |
-| `__builtin_elementwise_convert_from_f4e2m1fn` |
+`__mfp8` is also accepted as a scalar source on targets that have it: it is an opaque 8-bit container with no interpretation of its own, which is exactly what this builtin supplies. Its Neon vector types are rejected with the other target-specific kinds.
 
-### Destination type argument
-
-The second argument is the complete result type, following `__builtin_convertvector`.
-A scalar source takes a scalar destination, and a vector source takes a vector destination whose element count matches the source.
-A mismatched element count is diagnosed.
-
-The destination element type is validated by its floating-point semantics rather than by a fixed list of spellings.
-Accepted semantics are IEEE half, bfloat16, IEEE single, and IEEE double, which admits `_Float16`, `__bf16`, `float`, `double`, OpenCL `half`, and any typedef of them.
-x87 extended, PPC double-double, IEEE quad, and `__mfp8` are rejected because the intrinsic lowering does not support them.
-
-Validating by semantics rather than by spelling has a practical benefit over encoding the destination in the name: a caller passes whatever type it already uses, including a typedef, and OpenCL code passes `half` directly instead of converting from `_Float16` afterwards.
-
-`__fp16` and OpenCL `half` are the same type in Clang and both have IEEE half semantics, so a purely semantic rule accepts `__fp16` too.
-Outside OpenCL its arithmetic is promoted, which makes it a questionable result type.
-Whether to accept it is a language-mode decision rather than a semantic one, and is open question 3.
-
-Normal language and target availability rules apply to the destination type.
-Because it is an ordinary type argument, those rules apply through the usual type machinery rather than a builtin-specific check, so an unsupported destination produces the same diagnostic that any other use of the type would.
-
-### Extension to the narrowing direction
-
-Naming the encoding and passing native types as arguments extends to `llvm.convert.to.arbitrary.fp` without a combinatorial explosion:
+Integer promotions and the usual arithmetic conversions do **not** apply. This keeps the operand exactly matched to the intrinsic and avoids an implicit truncation rule, but it costs ergonomics, since every bit-manipulation expression in C has type `int`:
 
 ```c
-unsigned char bits = __builtin_elementwise_convert_to_f8e4m3fn(value, rounding, saturate);
+unsigned char b;
+__builtin_elementwise_convert_from_f8e5m2_f32(b >> 1);                  // error: 'int' is not 8 bits
+__builtin_elementwise_convert_from_f8e5m2_f32((unsigned char)(b >> 1)); // ok
 ```
 
-The narrowing direction needs no destination type argument at all, because the format determines the integer container width.
-It needs rounding and saturation operands, which must be ordinary constant arguments under any naming scheme.
+A vector result has the same element count, the destination element type, and the same vector kind — GNU `vector_size` or Clang/OpenCL `ext_vector_type`. Scalable, sizeless, matrix, and target-specific fixed kinds are rejected, because preserving both element count and a target-specific kind across widening can produce an invalid combination such as a widened NEON vector. Returning a generic vector instead would also be defensible; starting strict is source-compatible with relaxing later.
 
-That yields five widening builtins and five narrowing builtins, symmetric and each named by the encoding.
-A scheme that encodes the native type in the name instead cannot do this; see the alternatives below.
+Sema applies normal target and language availability rules to the result type, including target-aware diagnostics for offload code. Dependent C++ calls defer validation to instantiation.
 
-### Operand and result types
+## Conversion semantics
 
-Each builtin takes exactly two arguments: the source value and the destination type.
+Each element is interpreted as the named format and converted independently. For a caller:
 
-The source element type must:
+* every source bit pattern produces a defined result — no operand value is UB or poison;
+* all supported combinations are exact widening conversions for finite values;
+* `f8e4m3fn` has no infinity encoding;
+* NaN results follow LLVM's general NaN rules, with no promise about sign, quiet/signaling state, or payload (see prerequisite 2);
+* no dynamic rounding mode is consulted and there are no floating-environment side effects, so the call may be speculated.
 
-* be an integer type other than `_Bool` or `bool`,
-* not be an enumeration type, and
-* have exactly the bit width required by the source format.
+The vector form promises no particular instruction or packing strategy.
 
-Signedness has no semantic effect.
-The integer is a bit container rather than a numerically converted value.
+## Builtin support queries
 
-For example, `char`, `signed char`, and `unsigned char` are valid FP8 containers only on targets where those types are 8 bits wide.
-`_BitInt(8)` is also a valid FP8 container.
-FP6 and FP4 scalar operands require exact-width types such as `_BitInt(6)` and `_BitInt(4)`.
-Wider integer containers are rejected even when their low bits contain the desired encoding.
+`__has_builtin` reports only that Clang knows the spelling, which is what makes the *encoding* queryable — encodings have no other query mechanism. It says nothing about backend lowering, and nothing about **destination type availability**, which is a sharp edge worth stating up front:
 
-Usual lvalue-to-rvalue conversion applies.
-Integer promotions and usual arithmetic conversions do not apply to the source value.
-An integer literal of type `int` therefore requires an explicit cast to an accepted container type.
-
-A scalar source requires a scalar destination and a vector source requires a vector destination with the same element count.
-The result type is exactly the type written by the caller, so the destination decides whether the result is a GNU `vector_size` or a Clang/OpenCL `ext_vector_type` vector, and the two may be mixed.
-
-Only those two fixed-length vector kinds are supported initially, on either side.
-Scalable vectors, sizeless vectors, matrices, and target-specific fixed vector kinds such as NEON, AltiVec, fixed-length SVE, and fixed-length RVV are rejected.
-
-Clang permits `_BitInt` vector elements only when their width is a power of two.
-FP4 vectors can therefore use `_BitInt(4)` elements.
-The two FP6 formats are initially scalar-only because `_BitInt(6)` vector elements cannot be expressed.
-
-For dependent C++ calls, source validation and result formation are deferred until instantiation.
-
-### Conversion semantics
-
-Each integer element is interpreted as the named source format and converted independently to the destination type.
-The exact zero, infinity, NaN, and payload behavior is defined by `llvm.convert.from.arbitrary.fp`.
-
-The properties that matter to a caller are:
-
-* every source bit pattern produces a defined result, so no operand value is undefined behavior or poison,
-* all supported combinations are exact widening conversions for finite values,
-* the `FN` formats have no infinity encoding and the FP6 and FP4 formats have no NaN encoding, so those results never occur for those sources,
-* for a source format that does encode NaN, the result is a NaN of the same quiet or signaling character, but the payload may be truncated or extended, and
-* the conversion does not consult a dynamic rounding mode and has no floating-environment side effects, so it may be speculated.
-
-The vector operation does not promise a particular instruction or packing strategy.
-A target may use one packed instruction, several scalar instructions, or generic expansion.
-
-### Feature detection
-
-Each source encoding has a distinct query:
-
-```c
-#if __has_builtin(__builtin_elementwise_convert_from_f8e4m3fn)
-// Clang recognizes this source encoding.
-#endif
+```
+avr, msp430, sparc:
+  __has_builtin(__builtin_elementwise_convert_from_f8e5m2_bf16)  ->  1
+  __bf16 x;   ->  error: __bf16 is not supported on this target
 ```
 
-`__has_builtin` works on these spellings even though they are parsed as keywords, as it already does for `__builtin_convertvector`.
-Under offloading it considers the currently active compilation target.
-It reports frontend recognition of the spelling, and does not report native instruction support or guarantee a particular lowering.
+For `_Float16` a header can pair the query with `__FLT16_MANT_DIG__`. For `__bf16` **Clang defines no availability macro at all**, so there is currently no preprocessor guard for a `__bf16` entry point. That is a pre-existing gap, but this naming scheme leans on `__has_builtin`, so it should be closed — a `__BF16__`-style predefined macro is proposed as a follow-up.
 
-This is the right granularity because the destination is no longer part of the spelling.
-A per-pair query would in any case not have answered the question a header actually asks, since recognition of a spelling never implied that the destination type was usable on the target.
-Destination availability is instead answered by the ordinary means for a type, and produces the ordinary diagnostic.
+## Constant expressions
 
-The builtins are not gated on AMDGPU or another target feature because all supported source formats have generic lowering.
+Not supported initially: `__has_constexpr_builtin` returns zero and use in a constant-expression context is diagnosed, including in a static-storage initializer.
 
-### Constant expressions
+`__builtin_convertvector` and most `__builtin_elementwise_*` builtins are constant evaluable, and the evaluation here is small — `APFloat` has every semantic involved and the conversions are exact. In this form it is an ordinary builtin case in the classic evaluator and the bytecode interpreter rather than a new visitor in each. Deferring does not affect the spelling or type rules, but it does change the answer to `__has_constexpr_builtin` after shipping, hence open question 2.
 
-The initial implementation does not support constant evaluation.
-`__has_constexpr_builtin` returns zero, and a use in a context that requires a constant expression is diagnosed.
-
-This is the weakest part of the proposal.
-`__builtin_convertvector` is constant evaluable in both the tree evaluator and the bytecode interpreter, and the evaluation itself is small, because `APFloat` already has every source semantic involved and the conversions are exact.
-Deferring it does not change the spelling or the type rules, but it does change the answer to `__has_constexpr_builtin` after the builtins have shipped.
-Open question 2 asks whether it belongs in the initial patch.
-
-## Lowering and Clang implementation
-
-The scalar example in the summary lowers to:
+## Implementation
 
 ```llvm
 %result = call float @llvm.convert.from.arbitrary.fp.f32.i8(
     i8 %bits, metadata !"Float8E4M3FN")
 ```
 
-A type argument cannot be parsed as an ordinary call argument, so each spelling is a keyword with a parser production that calls `ParseTypeName`, and the result is a dedicated expression node rather than a `CallExpr`.
-This follows `__builtin_convertvector` exactly, and it is the main cost of the proposal.
-Beyond Sema and CodeGen it requires:
-
-* a `TokenKinds.def` keyword per spelling and a `ParseExpr.cpp` production,
-* a `StmtNodes.td` node with dependence computation, classification, printing, and profiling,
-* `TreeTransform` and `ASTImporter` support,
-* a serialization record and reader and writer support,
-* an Itanium mangling rule, and
-* `RecursiveASTVisitor`, libclang, and static analyzer entries.
-
-This cost is known rather than estimated.
-The earlier string-and-type prototype implemented all of it in about 480 added lines across 30 non-test files.
-The proposed form is that work minus the format string and its validation, plus one keyword per source encoding instead of one in total.
-
-The five source encodings map to LLVM interpretation names in one place, and CodeGen emits the scalar or vector intrinsic with that metadata.
+A TableGen multiclass defines the six spellings with `NoThrow`, `Const`, and `CustomTypeChecking`. Exposed encodings live in `clang/include/clang/Basic/ArbitraryFPFormats.def`, which Sema and CodeGen expand to recover the interpretation from the builtin ID; because the expansion names builtin IDs directly, a stale entry fails to compile. Tests cover spelling queries, the absence of deferred encodings, result types and emission for all six, every diagnostic, the promotion cast requirement, GNU and extended vectors, `__mfp8`, dependent C++ templates, and C/C++/OpenCL — including `half` interoperation — plus per-target availability and an OpenMP device case.
 
 ## Alternatives considered
 
-### Source and destination both encoded in the name
+**Destination as a type argument** — `__builtin_elementwise_convert_from_f8e4m3fn(encoded, float)`. Also prototyped, and genuinely better in several ways: two names instead of six and one per new encoding rather than three; the destination is validated by its floating-point semantics rather than a fixed list, so callers can pass a typedef and OpenCL can pass `half`; `f64` becomes an ordinary type-availability question; and the encoding stays in the name, so `__has_builtin` remains meaningful for the part that has no other query. Rejected on the frontend and ABI cost measured above. Reviewers were split — @arsenm preferred the suffix form, @MrSidims does not find suffix overloads ergonomic. Open question 1.
 
-The most recent prototype encodes both types in the spelling and takes a single argument:
+**An f32-only family** — every exposed conversion is exact into every destination (`Float8E5M2` is 1-5-2, `Float8E4M3FN` is 1-4-3, both strictly inside `_Float16`, `__bf16`, and `float`), so `float` is a lossless intermediate and `(_Float16)__builtin_..._f32(x)` cannot double-round. Two names, no destination multiplier, at the cost of relying on a `fptrunc`-of-intrinsic peephole for native f16 selection.
 
-```c
-float value = __builtin_elementwise_convert_from_f8e4m3fn_f32(encoded);
-```
+**String plus destination type** — the original prototype. Prevented any per-encoding `__has_builtin` query, drew pushback on string-selected semantics, and paid the same custom-AST cost.
 
-This is a real alternative with one significant advantage: the builtins stay ordinary `CallExpr`s.
-No keyword, parser production, expression node, serialization record, mangling rule, or AST visitor entry is required, and constant evaluation would later be an ordinary builtin case rather than two new evaluator nodes.
-Moving to it from the string-and-type prototype removed roughly 460 non-test lines, most of it parser, AST, serialization, and mangling support.
+**Enum-selected source and destination** — keeps an ordinary `CallExpr` and avoids name growth, but makes the result type depend on an argument value, and an enum needs a separate way to query accepted enumerators.
 
-It was not chosen for three reasons:
+**Wider integer containers** — would remove the cast shown above and give sub-byte encodings a byte-lane representation, but the exact-width contract matches the intrinsic type and avoids an implicit truncation rule. The natural fallback if the promotion ergonomics prove unacceptable.
 
-* It needs twenty spellings for the initial set, one per source and destination pair, and each new destination type multiplies the whole set.
-* It does not extend to the narrowing direction. Encoding the native type in the name there would require five formats times four native types times five rounding modes times two saturation choices, so that family would have to adopt a different convention and the two directions would diverge.
-* Its main claimed benefit, a per-pair `__has_builtin`, does not do what a header needs. The spellings are target independent, so `__has_builtin(__builtin_elementwise_convert_from_f8e5m2_bf16)` is true even where `__bf16` cannot be used, and the header still needs a separate type-availability check.
+**First-class narrow types** — broad language and ABI effects. Note Clang already has one, `__mfp8`, which this accepts as a container rather than duplicating.
 
-The tradeoff is therefore custom AST surface against name-space growth and an asymmetry with the narrowing direction.
-Open question 1 asks whether that trade is judged correctly.
+## Future directions
 
-### String and destination type argument
+**Sub-byte encodings.** FP6 cannot be spelled at all — Clang has no 6-bit vector element type. FP4 can be spelled scalar as `_BitInt(4)`, and `_BitInt(4)` vectors are permitted since 4 is a power of two, but their layout is incoherent today: for `<8 x _BitInt(4)>` Clang reports `sizeof` 8 while the emitted `<8 x i4>` occupies 4 bytes, and the x86-64 ABI then coerces the argument to `double`. Exposing an FP4 vector API on that would bake in a layout matching neither Clang's own `sizeof` nor the packed nibbles hardware uses. Deferred until `_BitInt` vector layout is settled, or a packed integer container is chosen for sub-byte encodings.
 
-The original prototype in [PR #212647](https://github.com/llvm/llvm-project/pull/212647) used a string and a destination type argument:
+**f64 destination.** Supported by IR; deferred because no consumer has been identified and Clang's `double` is not uniformly IEEE binary64 across targets.
 
-```c
-__builtin_convert_from_arbitrary_fp(bits, "Float8E4M3FN", float)
-```
+**Additional source formats.** The verifier recognizes seven more names that `getArbitraryFPSemantics` does not admit to codegen (`Float8E5M2FNUZ`, `Float8E4M3`, `Float8E4M3FNUZ`, `Float8E4M3B11FNUZ`, `Float8E3M4`, `Float8E8M0FNU`, `Float8E5M3FNU`). Separately, LangRef omits `Float8E5M3FNU` from its list even though the verifier accepts it — worth fixing on its own.
 
-This mirrored the IR intrinsic, but it prevented any `__has_builtin` query for an individual format and drew pushback on using string arguments to select semantics.
-The form proposed here keeps its destination type argument and replaces the string with the builtin name.
+**Rounding and stochastic rounding.** Rounding never arises when widening, since every supported conversion is exact. It arises when narrowing, and stochastic rounding is not expressible today: `llvm.convert.to.arbitrary.fp` takes its rounding mode as metadata, and metadata cannot carry a seed, which is a runtime value. Hardware exists but only via target intrinsics — AMDGPU's `llvm.amdgcn.cvt.sr.fp8.f32` and siblings take an `i32` seed as an ordinary SSA operand. Supporting it generically needs an IR change: a seed operand meaningful only in a stochastic mode, or a separate intrinsic. That belongs with the narrowing family, but the answer should inform its operand list before it is designed.
 
-### Element type instead of full destination type
+**The narrowing direction.** It would name the destination encoding and deduce its source type, so it costs one spelling per encoding under any naming scheme. The asymmetry this proposal accepts is therefore not about name growth but about which direction has to name a type at all: only widening does, because only widening has a result type that cannot be deduced.
 
-The type argument could be the destination *element* type, with the result vector formed from the source element count:
+## Rollout
 
-```c
-float4 packed = __builtin_elementwise_convert_from_f8e4m3fn(bits4, float);
-```
-
-This makes the scalar and vector call sites identical and removes the element-count mismatch diagnostic.
-It was not chosen because it diverges from `__builtin_convertvector` for no strong reason, hides the result type from the reader at the call site, and leaves the result's vector kind to be inferred from the source rather than stated.
-Writing the full type also keeps the door open to destinations that are not a plain elementwise widening of the source shape.
-
-### Enum-selected source and destination
-
-One builtin could take compiler-provided enum constants for both the source format and the destination type:
-
-```c
-float value = __builtin_elementwise_convert_from_arbitrary_fp(
-    bits, __clang_arbitrary_fp_format_f8e4m3fn,
-    __clang_arbitrary_fp_destination_f32);
-```
-
-This keeps an ordinary `CallExpr` and avoids both the name growth and the parser work.
-It was not chosen because it reintroduces the original problem in a new spelling: the destination is a C type, and describing it with a compiler-provided enumerator rather than the type itself loses typedefs, loses the language's own availability rules, and makes the result type depend on an argument value.
-
-### Wider integer containers
-
-The source could accept any integer at least as wide as the format and ignore the high bits, which would let FP6 and FP4 values travel in `unsigned char` and would make FP6 vectors expressible today.
-It was not chosen because silently ignoring set high bits hides encoding bugs at the one point where the program asserts what its bits mean.
-Open question 4 revisits this, since it is the direct cause of the FP6 vector limitation.
-
-### Other options
-
-An f32-only builtin would reduce the API surface because all supported finite values fit in `float`, but would lose direct f16 instruction selection.
-First-class narrow types would have broad language and ABI effects, while header bit manipulation is verbose, error-prone, and harder to optimize.
-
-## Deferred formats and future directions
-
-### Additional source formats
-
-The LLVM verifier recognizes seven additional arbitrary floating-point interpretation names that `getArbitraryFPSemantics` does not yet admit to code generation:
-
-| Expected name suffix | LLVM interpretation |
-| --- | --- |
-| `f8e5m2fnuz` | `Float8E5M2FNUZ` |
-| `f8e4m3` | `Float8E4M3` |
-| `f8e4m3fnuz` | `Float8E4M3FNUZ` |
-| `f8e4m3b11fnuz` | `Float8E4M3B11FNUZ` |
-| `f8e3m4` | `Float8E3M4` |
-| `f8e8m0fnu` | `Float8E8M0FNU` |
-| `f8e5m3fnu` | `Float8E5M3FNU` |
-
-These remain unexposed until target-independent lowering exists for them.
-Under the proposed naming each one costs a single new builtin rather than one per destination type.
-
-The LangRef description of `llvm.convert.from.arbitrary.fp` currently omits `Float8E5M3FNU` from its list of interpretation strings even though the verifier accepts it, so a reader cross-referencing that list will count six rather than seven.
-That is an upstream documentation gap and is worth fixing separately.
-
-## Testing and rollout
-
-The Clang patch should cover:
-
-* feature queries for the five initial and seven deferred source encodings, plus a deferred constant-evaluation check,
-* result types and intrinsic emission for every source encoding against each accepted destination semantics,
-* accepted destination spellings including `_Float16`, `__bf16`, `float`, `double`, OpenCL `half`, and typedefs, and rejection of x87 extended, PPC double-double, IEEE quad, and `__mfp8`,
-* signed and unsigned exact-width sources and diagnostics for invalid source types or widths,
-* GNU-vector, extended-vector, FP4-vector, FP6-scalar, and unsupported-vector-kind tests,
-* dependent templates, mangling, serialization, and AST printing for the new expression node, and
-* C, C++, OpenCL, and target availability tests for the destination type.
-
-Existing LLVM AMDGPU tests cover native OCP FP8 lowering and generic fallback.
-The Clang patch should emit the same intrinsic forms rather than duplicate backend instruction-selection tests.
-
-After the RFC reaches consensus:
-
-1. Rework the existing prototype to the agreed form and submit builtin, Sema, CodeGen, documentation, and test changes.
-2. Adopt the builtins in HIP headers, guarded by both `__has_builtin` and the usual availability check for the destination type, while retaining FNUZ and older-compiler fallbacks.
-3. Add further source encodings only after their generic LLVM lowering is available.
-4. Consider constant evaluation and the narrowing family separately.
+1. Post the two prerequisite patches, then the Clang implementation.
+2. Adopt in HIP headers, guarded by `__has_builtin` plus the destination type's availability check, retaining FNUZ and older-compiler fallbacks.
+3. Reconsider deferred encodings given a consumer, a coherent source representation, and codegen support.
+4. Consider constant evaluation, GlobalISel support, and the narrowing family separately.
 
 ## Open questions
 
-1. Is a dedicated expression node, as `__builtin_convertvector` already uses, an acceptable price for the type argument, or is the twenty-name `CallExpr` form preferable despite the asymmetry with the narrowing direction?
-2. Should constant evaluation be in the initial patch rather than deferred?
-3. Should `__fp16` be an accepted destination, given that its arithmetic is promoted in some language modes?
-4. Should the source accept containers wider than the format, which would allow FP6 vectors, at the cost of silently ignoring high bits?
-5. Is exposing scalar-only FP6 conversions useful if question 4 is answered no?
+1. Is encoding the destination in the name the right trade? It keeps these as ordinary calls with no new mangling, at the cost of a spelling per destination type, no typedef or OpenCL `half` destinations, and a `__has_builtin` query that is silent about destination availability. The type-argument alternative is prototyped and measured above.
+2. Should constant evaluation be in the initial patch?
+3. Should a future narrowing family be designed around stochastic rounding from the start? It needs a runtime seed operand that metadata cannot carry, so this is also an IR design question.
 
 ## References
 
-* [`llvm.convert.from.arbitrary.fp` in the LLVM Language Reference](https://llvm.org/docs/LangRef.html#llvm-convert-from-arbitrary-fp-intrinsic)
-* [Prototype pull request #212647](https://github.com/llvm/llvm-project/pull/212647)
-* [AMDGPU custom lowering pull request #194144](https://github.com/llvm/llvm-project/pull/194144)
-* [APFloat UE5M3 pull request #210720](https://github.com/llvm/llvm-project/pull/210720)
-* [RFC: Add New Set of Vector Math Builtins](https://discourse.llvm.org/t/rfc-add-new-set-of-vector-math-builtins/58996)
+* [`llvm.convert.from.arbitrary.fp` in the LangRef](https://llvm.org/docs/LangRef.html#llvm-convert-from-arbitrary-fp-intrinsic)
+* [Prototype PR #212647](https://github.com/llvm/llvm-project/pull/212647) · [AMDGPU lowering PR #194144](https://github.com/llvm/llvm-project/pull/194144) · [APFloat UE5M3 PR #210720](https://github.com/llvm/llvm-project/pull/210720)
 * [[RFC] Introducing elementwise clz/ctz builtins](https://discourse.llvm.org/t/rfc-introducing-elementwise-clz-ctz-builtins/85862)
 * [[RFC] `__has_builtin` behavior on offloading targets](https://discourse.llvm.org/t/rfc-has-builtin-behavior-on-offloading-targets/84964)
 * [SPIR-V representation of OCP low-precision types](https://github.com/KhronosGroup/SPIRV-LLVM-Translator/blob/main/docs/OCPTypesRepresentationInLLVM.rst)
-* [HIP low-precision floating-point types](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/low_fp_types.html)
-* [HIP FP8 header](https://github.com/ROCm/clr/blob/develop/hipamd/include/hip/amd_detail/amd_hip_fp8.h)
+* [HIP low-precision floating-point types](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/low_fp_types.html) · [HIP FP8 header](https://github.com/ROCm/clr/blob/develop/hipamd/include/hip/amd_detail/amd_hip_fp8.h)

@@ -3847,7 +3847,6 @@ bool Expr::HasSideEffects(const ASTContext &Ctx,
   case MaterializeTemporaryExprClass:
   case ShuffleVectorExprClass:
   case ConvertVectorExprClass:
-  case ConvertFromArbitraryFPExprClass:
   case AsTypeExprClass:
   case CXXParenListInitExprClass:
     // These have a side-effect if any subexpression does.
@@ -5702,26 +5701,6 @@ ConvertVectorExpr *ConvertVectorExpr::Create(
   void *Mem = C.Allocate(Size, alignof(ConvertVectorExpr));
   return new (Mem) ConvertVectorExpr(SrcExpr, TI, DstType, VK, OK, BuiltinLoc,
                                      RParenLoc, FPFeatures);
-}
-
-StringRef ConvertFromArbitraryFPExpr::getFormatName(ArbitraryFPFormat Format) {
-  switch (Format) {
-#define ARBITRARY_FP_FORMAT(Suffix, LLVMName)                                  \
-  case AFPF_##Suffix:                                                          \
-    return LLVMName;
-#include "clang/Basic/ArbitraryFPFormats.def"
-  }
-  llvm_unreachable("invalid arbitrary floating-point format");
-}
-
-StringRef ConvertFromArbitraryFPExpr::getBuiltinName(ArbitraryFPFormat Format) {
-  switch (Format) {
-#define ARBITRARY_FP_FORMAT(Suffix, LLVMName)                                  \
-  case AFPF_##Suffix:                                                          \
-    return "__builtin_elementwise_convert_from_" #Suffix;
-#include "clang/Basic/ArbitraryFPFormats.def"
-  }
-  llvm_unreachable("invalid arbitrary floating-point format");
 }
 
 APValue &CompoundLiteralExpr::getOrCreateStaticValue(ASTContext &Ctx) const {

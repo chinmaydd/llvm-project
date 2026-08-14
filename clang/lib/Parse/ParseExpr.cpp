@@ -1090,9 +1090,6 @@ Parser::ParseCastExpression(CastParseKind ParseKind, bool isAddressOfOperand,
   case tok::kw___builtin_choose_expr:
   case tok::kw___builtin_astype: // primary-expression: [OCL] as_type()
   case tok::kw___builtin_convertvector:
-#define ARBITRARY_FP_FORMAT(Suffix, LLVMName)                                  \
-  case tok::kw___builtin_elementwise_convert_from_##Suffix:
-#include "clang/Basic/ArbitraryFPFormats.def"
   case tok::kw___builtin_COLUMN:
   case tok::kw___builtin_FILE:
   case tok::kw___builtin_FILE_NAME:
@@ -2584,50 +2581,6 @@ ExprResult Parser::ParseBuiltinPrimaryExpression() {
 
     Res = Actions.ActOnConvertVectorExpr(Expr.get(), DestTy.get(), StartLoc,
                                          ConsumeParen());
-    break;
-  }
-  case tok::kw___builtin_elementwise_convert_from_f8e5m2:
-  case tok::kw___builtin_elementwise_convert_from_f8e4m3fn:
-  case tok::kw___builtin_elementwise_convert_from_f6e3m2fn:
-  case tok::kw___builtin_elementwise_convert_from_f6e2m3fn:
-  case tok::kw___builtin_elementwise_convert_from_f4e2m1fn: {
-    ConvertFromArbitraryFPExpr::ArbitraryFPFormat Format;
-    switch (T) {
-    default:
-      llvm_unreachable("not an arbitrary floating-point conversion builtin");
-#define ARBITRARY_FP_FORMAT(Suffix, LLVMName)                                  \
-  case tok::kw___builtin_elementwise_convert_from_##Suffix:                    \
-    Format = ConvertFromArbitraryFPExpr::AFPF_##Suffix;                        \
-    break;
-#include "clang/Basic/ArbitraryFPFormats.def"
-    }
-
-    // The first argument is the integer holding the arbitrary FP bits.
-    ExprResult Expr(ParseAssignmentExpression());
-    if (Expr.isInvalid()) {
-      SkipUntil(tok::r_paren, StopAtSemi);
-      return ExprError();
-    }
-
-    if (ExpectAndConsume(tok::comma)) {
-      SkipUntil(tok::r_paren, StopAtSemi);
-      return ExprError();
-    }
-
-    // The second argument is the destination floating-point type.
-    TypeResult DestTy = ParseTypeName();
-    if (DestTy.isInvalid())
-      return ExprError();
-
-    // Attempt to consume the r-paren.
-    if (Tok.isNot(tok::r_paren)) {
-      Diag(Tok, diag::err_expected) << tok::r_paren;
-      SkipUntil(tok::r_paren, StopAtSemi);
-      return ExprError();
-    }
-
-    Res = Actions.ActOnConvertFromArbitraryFPExpr(
-        Expr.get(), Format, DestTy.get(), StartLoc, ConsumeParen());
     break;
   }
   case tok::kw___builtin_COLUMN:

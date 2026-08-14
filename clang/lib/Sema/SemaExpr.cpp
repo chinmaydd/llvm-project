@@ -7105,15 +7105,6 @@ ExprResult Sema::ActOnConvertVectorExpr(Expr *E, ParsedType ParsedDestTy,
   return ConvertVectorExpr(E, TInfo, BuiltinLoc, RParenLoc);
 }
 
-ExprResult Sema::ActOnConvertFromArbitraryFPExpr(
-    Expr *E, ConvertFromArbitraryFPExpr::ArbitraryFPFormat Fmt,
-    ParsedType ParsedDestTy, SourceLocation BuiltinLoc,
-    SourceLocation RParenLoc) {
-  TypeSourceInfo *TInfo;
-  GetTypeFromParser(ParsedDestTy, &TInfo);
-  return ConvertFromArbitraryFPExpr(E, Fmt, TInfo, BuiltinLoc, RParenLoc);
-}
-
 ExprResult Sema::BuildResolvedCallExpr(Expr *Fn, NamedDecl *NDecl,
                                        SourceLocation LParenLoc,
                                        ArrayRef<Expr *> Args,
